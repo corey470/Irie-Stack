@@ -27,6 +27,7 @@ pnpm-debug.log*
 .vscode/
 .idea/
 *.swp
+.claude/
 
 # Misc
 .cache/

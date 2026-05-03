@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg-primary text-text-primary;
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Honest focus rings — non-negotiable per DESIGN.md §12 */
+  *:focus-visible {
+    outline: 2px solid theme("colors.accent.deep");
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Reduced motion — disable hero zoom, reveals, pulse */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .container-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .reveal-section {
+    @apply opacity-0;
+    animation: reveal-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-play-state: paused;
+  }
+
+  .reveal-section.in-view {
+    animation-play-state: running;
+  }
+}
