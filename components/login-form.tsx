@@ -1,12 +1,17 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+type Mode = "magic" | "password";
 type Status = "idle" | "submitting" | "sent" | "error";
 
 export function LoginForm() {
+  const router = useRouter();
+  const [mode, setMode] = useState<Mode>("password");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +36,28 @@ export function LoginForm() {
       return;
     }
     setStatus("sent");
+  }
+
+  async function onPassword(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!email || !password || status === "submitting") return;
+
+    setStatus("submitting");
+    setError(null);
+
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (err) {
+      setStatus("error");
+      setError(err.message);
+      return;
+    }
+    router.push("/app");
+    router.refresh();
   }
 
   async function onGoogle() {
@@ -59,40 +86,86 @@ export function LoginForm() {
           <span className="font-medium text-text-primary">{email}</span>. Click
           it from the same browser.
         </p>
+        <button
+          type="button"
+          onClick={() => {
+            setStatus("idle");
+            setError(null);
+          }}
+          className="mt-4 text-sm text-text-secondary hover:text-text-primary transition-colors"
+        >
+          Use a different email
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <form onSubmit={onMagicLink} className="space-y-3" noValidate>
-        <div>
-          <label
-            htmlFor="login-email"
-            className="block text-sm font-medium text-text-primary mb-1.5"
-          >
-            Email
-          </label>
-          <input
+    <div className="space-y-5">
+      {mode === "password" ? (
+        <form onSubmit={onPassword} className="space-y-3" noValidate>
+          <Field
             id="login-email"
+            label="Email"
             type="email"
-            required
             autoComplete="email"
-            placeholder="you@yourdomain.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={setEmail}
             disabled={status === "submitting"}
-            className="h-12 w-full rounded-md border border-border bg-bg-surface px-4 text-[16px] text-text-primary placeholder:text-text-muted shadow-card transition-colors duration-150 focus:border-accent disabled:opacity-60"
+            placeholder="you@yourdomain.com"
           />
-        </div>
-        <button
-          type="submit"
-          disabled={status === "submitting" || !email}
-          className="h-12 w-full rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-accent-light hover:shadow-card-hover disabled:opacity-60"
-        >
-          {status === "submitting" ? "Sending…" : "Send sign-in link"}
-        </button>
-      </form>
+          <Field
+            id="login-password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={setPassword}
+            disabled={status === "submitting"}
+            placeholder="Your password"
+          />
+          <button
+            type="submit"
+            disabled={status === "submitting" || !email || !password}
+            className="h-12 w-full rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all hover:bg-accent-light hover:shadow-card-hover disabled:opacity-60"
+          >
+            {status === "submitting" ? "Signing in…" : "Sign in"}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={onMagicLink} className="space-y-3" noValidate>
+          <Field
+            id="login-email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={setEmail}
+            disabled={status === "submitting"}
+            placeholder="you@yourdomain.com"
+          />
+          <button
+            type="submit"
+            disabled={status === "submitting" || !email}
+            className="h-12 w-full rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all hover:bg-accent-light hover:shadow-card-hover disabled:opacity-60"
+          >
+            {status === "submitting" ? "Sending…" : "Send sign-in link"}
+          </button>
+        </form>
+      )}
+
+      <button
+        type="button"
+        onClick={() => {
+          setMode((m) => (m === "password" ? "magic" : "password"));
+          setError(null);
+        }}
+        className="block w-full text-center text-sm text-text-secondary hover:text-text-primary transition-colors"
+      >
+        {mode === "password"
+          ? "Use a magic link instead"
+          : "Use a password instead"}
+      </button>
 
       <div className="flex items-center gap-3">
         <span className="h-px flex-1 bg-border-subtle" />
@@ -105,7 +178,7 @@ export function LoginForm() {
       <button
         type="button"
         onClick={onGoogle}
-        className="h-12 w-full rounded-md border border-border bg-bg-surface px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-bg-hover hover:border-border-hover inline-flex items-center justify-center gap-2.5"
+        className="h-12 w-full rounded-md border border-border bg-bg-surface px-6 text-[15px] font-medium text-text-primary shadow-card transition-all hover:bg-bg-hover hover:border-border-hover inline-flex items-center justify-center gap-2.5"
       >
         <GoogleIcon />
         Continue with Google
@@ -116,6 +189,48 @@ export function LoginForm() {
           {error}
         </p>
       )}
+    </div>
+  );
+}
+
+function Field({
+  id,
+  label,
+  type,
+  autoComplete,
+  value,
+  onChange,
+  disabled,
+  placeholder,
+}: {
+  id: string;
+  label: string;
+  type: string;
+  autoComplete: string;
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-text-primary mb-1.5"
+      >
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        required
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="h-12 w-full rounded-md border border-border bg-bg-surface px-4 text-[16px] text-text-primary placeholder:text-text-muted shadow-card transition-colors focus:border-accent disabled:opacity-60"
+      />
     </div>
   );
 }
