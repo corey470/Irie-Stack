@@ -5,8 +5,8 @@ import { SignOutButton } from "@/components/sign-out-button";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/app", icon: DashboardIcon },
-  { label: "Stack", href: "/app", icon: StackIcon, disabled: true },
-  { label: "Generate", href: "/app", icon: GenerateIcon, disabled: true },
+  { label: "Stack", href: "/app/stack", icon: StackIcon },
+  { label: "Generate", href: "/app/generate", icon: GenerateIcon },
   { label: "Review", href: "/app", icon: ReviewIcon, disabled: true },
   { label: "Settings", href: "/app", icon: SettingsIcon, disabled: true },
 ];

@@ -14,12 +14,18 @@ export default function AppHome() {
         actually talk. After that, the system writes the way you do.
       </p>
 
-      <div className="mt-10">
+      <div className="mt-10 flex flex-wrap gap-3">
         <Link
-          href="/onboarding"
+          href="/app/stack"
           className="inline-flex h-12 items-center justify-center rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-accent-light hover:shadow-card-hover animate-cta-pulse"
         >
-          Start onboarding
+          Set up your Stack
+        </Link>
+        <Link
+          href="/app/generate"
+          className="inline-flex h-12 items-center justify-center rounded-md border border-border bg-bg-surface px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-bg-hover"
+        >
+          Generate posts
         </Link>
       </div>
 
