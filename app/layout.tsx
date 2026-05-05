@@ -18,7 +18,7 @@ const dmSerif = DM_Serif_Display({
 export const metadata: Metadata = {
   title: "IrieStack — your voice, on autopilot",
   description:
-    "Train it once. It writes the way you talk. 20 platform-native posts a week, never sounds like AI.",
+    "Train it once. It writes the way you talk. A month of platform-native posts without the copy-paste grind.",
 };
 
 export default function RootLayout({

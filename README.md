@@ -1,10 +1,30 @@
 # IrieStack
 
-**One idea in. A week of content out. On your voice, on your terms.**
+**One messy idea in. A 30-day content run out. In your voice, on your terms.**
 
-IrieStack is a SaaS that turns a single piece of long-form content (or a single topic) into a full week of platform-native posts, runs on autopilot or approval mode toggleable per channel, and gets sharper every week through a context system the customer builds once and refines forever.
+IrieStack is a SaaS that turns a source, topic, voice memo, blog draft, or campaign angle into a full 30-day run of platform-native posts, image briefs, approvals, and scheduled output. It can run on autopilot or approval mode per channel, and it gets sharper every week through a context system the customer builds once and refines forever.
 
-It's the productized version of what Alex Hormozi described in April 2026: stop writing better prompts, start building context systems. IrieStack does the context-system part for the customer, runs the engine, and either posts directly or hands the customer an approval queue — their choice, per platform.
+It's the productized version of what Alex Hormozi described in April 2026: stop writing better prompts, start building context systems. IrieStack does the context-system part for the customer, runs the engine, and either posts directly or hands the customer an approval queue - their choice, per platform.
+
+---
+
+## Current checkpoint
+
+The public landing page now presents IrieStack as a 30-day content engine for operators:
+
+- Above the fold shows the dream outcome: one messy source becoming a month of social posts, image briefs, calendar slots, approvals, and queue status.
+- The hero includes motion: flow steps, animated calendar cells, rotating platform cards, agent status rows, and a delivery receipt.
+- The page explains the full workflow after the fold: campaign source, platform-native posts, image direction, 30-day calendar, approval control, and posting queue.
+- Mobile has been tightened with larger tap targets, earlier CTA placement, reduced vertical drag, and a compact live-run preview.
+- The early-adopter CTA appears throughout the page, with the waitlist form at the end.
+
+Verified before this checkpoint:
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
 
 ---
 
@@ -12,13 +32,13 @@ It's the productized version of what Alex Hormozi described in April 2026: stop 
 
 Most people creating content for their business hit the same three walls:
 
-1. **The volume wall.** They know they should be posting 5–20 times a week across multiple platforms. They post 2 a week and wonder why nothing grows.
+1. **The volume wall.** They know they should be posting consistently across multiple platforms. They post twice, disappear for a week, and wonder why nothing grows.
 2. **The voice wall.** They try AI tools and the output sounds like AI — generic, hollow, not them. They spend more time editing than they would have spent writing.
 3. **The trust wall.** They don't trust AI to post on their behalf. So they either don't use AI at all, or they use it and review every single piece manually, which kills the volume gains.
 
 IrieStack solves all three:
 
-- **Volume** — one input becomes 20+ pieces, automatically platform-formatted.
+- **Volume** — one input becomes a 30-day content run, automatically platform-formatted.
 - **Voice** — the customer's Context Stack loads on every generation. The output sounds like them because the AI knows them.
 - **Trust** — per-platform autopilot/approval toggle. Customer dials trust up where they're confident, keeps it tight where they're not.
 
@@ -39,6 +59,8 @@ The customer can use any of three input modes:
 - **Repurpose mode** — paste a long-form piece (newsletter, transcript, blog post, podcast notes). IrieStack fragments it into 20+ platform-native pieces.
 - **Generate mode** — give a topic or angle. IrieStack researches, drafts, and produces content from scratch.
 - **Pipeline mode** — fully autonomous. IrieStack picks topics from the customer's themes, generates content on a schedule, and runs the loop.
+
+The current landing page focuses on the most sellable promise: give it one messy source and leave with a 30-day calendar, image briefs, approvals, and a posting queue.
 
 ### Step 3 — Choose the trust level (per platform)
 
@@ -61,7 +83,7 @@ The customer this is built for has these traits:
 
 - **Solo or small-team operator** — founder, consultant, coach, creator, agency owner.
 - **Already has a voice they care about** — they're not trying to ghost-write a generic brand. They're trying to be omnipresent as themselves.
-- **Has long-form raw material already** — newsletters, podcast episodes, YouTube videos, blog posts. They're sitting on content gold and only mining 5%.
+- **Has raw material or a business angle** — newsletters, podcast episodes, YouTube videos, blog posts, voice notes, rough campaign ideas, or customer problems they need to explain.
 - **Wants control without manual labor** — they want to direct the work, not do the work.
 
 This is **not** for: enterprise marketing teams, social media agencies running 50 client accounts, or people who want to set up an automated faceless content farm. Those are different products.
@@ -103,7 +125,7 @@ Irie_Stack/
 - **Auth:** Supabase Auth (or whatever the DB decision lands on). Google OAuth + email magic link.
 - **AI:** Anthropic Claude API (primary), with model selection per task — Haiku for cheap classification, Sonnet for content generation, Opus for complex reasoning like Voice Validation.
 - **Scheduling/queueing:** Inngest or a simple cron + DB queue. Decided in Phase 2.
-- **Platform connectors:** Direct API integrations where available (X, LinkedIn, Threads). Buffer/Publer integration as a fallback for platforms with hostile APIs (TikTok, IG).
+- **Platform connectors:** Direct API integrations where available, with the Irie social relay acting as the long-term posting layer. Some platforms may still require staged posting, manual approval, or customer-owned credentials depending on API access.
 
 ---
 

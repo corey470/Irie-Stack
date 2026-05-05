@@ -11,6 +11,7 @@
   body {
     @apply bg-bg-primary text-text-primary;
     font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    overflow-wrap: anywhere;
   }
 
   /* Honest focus rings — non-negotiable per DESIGN.md §12 */
@@ -38,6 +39,30 @@
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
+  .workspace-shell {
+    @apply w-full px-4 pb-24 pt-4 sm:px-5 md:pb-6 lg:px-6;
+  }
+
+  .workspace-page {
+    @apply w-full max-w-none;
+  }
+
+  .workspace-header {
+    @apply mb-5 flex flex-wrap items-end justify-between gap-4 border-b border-border-subtle pb-4;
+  }
+
+  .workspace-kicker {
+    @apply mb-2 text-xs font-medium uppercase tracking-[0.2em] text-accent-deep;
+  }
+
+  .workspace-title {
+    @apply font-display text-[clamp(1.8rem,3vw,2.35rem)] leading-[1.05] text-text-primary;
+  }
+
+  .workspace-copy {
+    @apply mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary;
+  }
+
   .reveal-section {
     @apply opacity-0;
     animation: reveal-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -46,5 +71,212 @@
 
   .reveal-section.in-view {
     animation-play-state: running;
+  }
+
+  .hero-progress {
+    width: 18%;
+    animation: hero-progress 7.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .hero-stage {
+    transform: perspective(1200px) rotateX(1.5deg) rotateY(-3deg);
+    transform-origin: center;
+  }
+
+  .hero-scanline {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(201, 168, 76, 0.16) 50%,
+      transparent 100%
+    );
+    height: 38%;
+    opacity: 0;
+    animation: hero-scanline 8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .hero-recipe-row {
+    opacity: 0.45;
+    animation: hero-recipe-rise 4.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .hero-flow-step {
+    opacity: 0.72;
+    transform: translateY(0);
+    animation: hero-flow-step 4.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .hero-calendar-cell {
+    opacity: 0.58;
+    transform: translateY(0) scale(1);
+    animation: hero-calendar-fill 8.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .hero-calendar-cell.has-post {
+    opacity: 0.9;
+  }
+
+  .hero-focus-card {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    opacity: 0;
+    overflow: hidden;
+    transform: translate3d(44px, 28px, 0) rotate(2.5deg) scale(0.9);
+    animation: hero-focus-card 18s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    will-change: opacity, transform;
+  }
+
+  .hero-focus-card p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+  .hero-focus-card footer {
+    margin-top: 0.85rem;
+  }
+
+  .hero-focus-card-1 {
+    animation-delay: 0s;
+  }
+
+  .hero-focus-card-2 {
+    animation-delay: 3s;
+  }
+
+  .hero-focus-card-3 {
+    animation-delay: 6s;
+  }
+
+  .hero-focus-card-4 {
+    animation-delay: 9s;
+  }
+
+  .hero-focus-card-5 {
+    animation-delay: 12s;
+  }
+
+  .hero-focus-card-6 {
+    animation-delay: 15s;
+  }
+
+  .hero-agent-row {
+    animation: hero-agent-pulse 4.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+}
+
+@keyframes hero-progress {
+  0% {
+    width: 18%;
+  }
+  42% {
+    width: 76%;
+  }
+  68%,
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes hero-scanline {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(-55%);
+  }
+  26%,
+  44% {
+    opacity: 0.75;
+  }
+  62%,
+  100% {
+    opacity: 0;
+    transform: translateY(230%);
+  }
+}
+
+@keyframes hero-recipe-rise {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  26%,
+  60% {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-flow-step {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: translateY(0);
+    border-color: rgba(201, 168, 76, 0.2);
+  }
+  18%,
+  42% {
+    opacity: 1;
+    transform: translateY(-3px);
+    border-color: rgba(232, 201, 106, 0.72);
+  }
+}
+
+@keyframes hero-calendar-fill {
+  0% {
+    opacity: 0.5;
+    transform: translateY(0) scale(1);
+    background-color: #ffffff;
+  }
+  10%,
+  32% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.015);
+    background-color: #fffaf0;
+  }
+  46%,
+  100% {
+    opacity: 0.72;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hero-focus-card {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  14% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  18%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-34px, -18px, 0) rotate(-1.5deg) scale(0.96);
+  }
+}
+
+@keyframes hero-agent-pulse {
+  0%,
+  100% {
+    opacity: 0.56;
+    transform: translateX(0);
+  }
+  30%,
+  58% {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero-stage {
+    transform: none;
   }
 }

@@ -33,16 +33,23 @@ const outputs = [
 
 export function Transformation() {
   return (
-    <section className="container-shell py-24 sm:py-32">
-      <div className="mb-16 max-w-2xl">
+    <section className="border-y border-border-subtle bg-bg-marketing-deep">
+      <div className="container-shell py-16 sm:py-28">
+      <div className="mb-14 grid gap-8 lg:grid-cols-12 lg:items-end">
+        <div className="lg:col-span-7">
         <p className="mb-3 text-xs font-medium uppercase tracking-[0.22em] text-accent-deep">
-          One in. Many out.
+          Same idea, every room
         </p>
         <h2 className="font-display text-[clamp(2rem,5vw,3.75rem)] leading-[1.05] tracking-tight text-text-primary">
-          Same idea.
-          <br />
-          Four mouths.
+          The post changes shape so it belongs where it lands.
         </h2>
+        </div>
+        <div className="lg:col-span-5">
+          <p className="text-[clamp(1rem,1.35vw,1.1rem)] leading-relaxed text-text-secondary">
+            One thought should not be pasted everywhere. The system keeps the
+            core idea intact, then rewrites the rhythm for each platform.
+          </p>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
@@ -51,13 +58,13 @@ export function Transformation() {
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted">
             Source
           </p>
-          <pre className="whitespace-pre-wrap rounded-lg bg-text-primary p-6 font-mono text-[13px] leading-[1.7] text-bg-marketing">
+          <pre className="whitespace-pre-wrap rounded-lg bg-text-primary p-4 font-mono text-[12px] leading-[1.65] text-bg-marketing sm:p-6 sm:text-[13px]">
             {source}
           </pre>
           <div className="mt-6 flex items-center gap-3">
             <Arrow />
             <p className="text-sm text-text-muted">
-              ~12 seconds later
+              The engine turns it into channel-ready copy.
             </p>
           </div>
         </div>
@@ -88,6 +95,18 @@ export function Transformation() {
             </article>
           ))}
         </div>
+      </div>
+      <div className="mt-12 flex flex-wrap items-center gap-4">
+        <a
+          href="#waitlist"
+          className="inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 text-sm font-semibold text-text-primary transition-colors hover:bg-accent-light"
+        >
+          Let me test the engine
+        </a>
+        <p className="text-sm text-text-muted">
+          Start with one source. Leave with a month.
+        </p>
+      </div>
       </div>
     </section>
   );

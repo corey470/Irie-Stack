@@ -53,7 +53,7 @@ export function WaitlistForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-col sm:flex-row gap-3 text-left"
+      className="flex flex-col items-stretch gap-3 text-left sm:flex-row"
       noValidate
     >
       <label htmlFor="waitlist-email" className="sr-only">
@@ -68,12 +68,12 @@ export function WaitlistForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={status === "submitting"}
-        className="h-12 flex-1 rounded-md border border-border bg-bg-surface px-4 text-[16px] text-text-primary placeholder:text-text-muted shadow-card transition-colors duration-150 focus:border-accent disabled:opacity-60"
+        className="h-12 w-full flex-1 rounded-md border border-border bg-bg-surface px-4 text-[16px] text-text-primary placeholder:text-text-muted shadow-card transition-colors duration-150 focus:border-accent disabled:opacity-60"
       />
       <button
         type="submit"
         disabled={status === "submitting" || !email}
-        className="h-12 rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-accent-light hover:shadow-card-hover disabled:opacity-60 disabled:hover:bg-accent disabled:hover:shadow-card"
+        className="h-12 w-full rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-accent-light hover:shadow-card-hover disabled:opacity-60 disabled:hover:bg-accent disabled:hover:shadow-card sm:w-auto"
       >
         {status === "submitting" ? "Adding…" : "Join"}
       </button>
