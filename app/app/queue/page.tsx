@@ -87,9 +87,11 @@ export default async function QueuePage({
           <NextActionPanel pieces={(pieces ?? []) as unknown as PieceRow[]} status={status} />
           <StatusNav status={status} />
           <ReviewPlaylist pieces={(pieces ?? []) as unknown as PieceRow[]} />
-          {((pieces ?? []) as unknown as PieceRow[]).map((piece) => (
-            <QueuePiece key={piece.id} piece={piece} />
-          ))}
+          <div className="grid gap-3">
+            {((pieces ?? []) as unknown as PieceRow[]).map((piece, index) => (
+              <QueuePiece key={piece.id} piece={piece} index={index} />
+            ))}
+          </div>
           {(!pieces || pieces.length === 0) && (
             <div className="rounded-md border border-border bg-bg-surface p-6 text-sm text-text-secondary shadow-card">
               No posts in this bucket. Create a plan first, then IrieStack will
@@ -241,7 +243,7 @@ function ReviewStat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function QueuePiece({ piece }: { piece: PieceRow }) {
+function QueuePiece({ piece, index }: { piece: PieceRow; index: number }) {
   const canPost =
     piece.status === "approved" &&
     piece.format !== "thread" &&
@@ -252,51 +254,67 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
     !needsImage(piece);
 
   return (
-    <article id={`post-${piece.id}`} className="rounded-md border border-border bg-bg-surface shadow-card">
-      <header className="grid gap-3 border-b border-border-subtle p-4 lg:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="min-w-0">
-          <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wider text-text-muted">
-            <span className="rounded-full bg-bg-elevated px-2 py-1 font-semibold text-text-primary">
-              {pretty(piece.platform)}
-            </span>
-            <span>{pretty(piece.level)}</span>
-            <span>{pretty(piece.format)}</span>
-            {piece.destination?.label && <span>To {piece.destination.label}</span>}
-          </div>
-          <h2 className="text-base font-semibold text-text-primary">{piece.title}</h2>
-          <p className="mt-1 truncate text-xs text-text-muted">
-            {piece.content_runs?.name ?? "Untitled run"}
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-xs lg:text-right">
-          <div className="rounded-md bg-bg-elevated p-2">
-            <p className="uppercase tracking-wider text-text-muted">Time</p>
-            <p className="mt-1 text-text-primary">
-              {piece.scheduled_for
-                ? new Date(piece.scheduled_for).toLocaleString()
-                : "Unscheduled"}
-            </p>
-          </div>
-          <div className="rounded-md bg-bg-elevated p-2">
-            <p className="uppercase tracking-wider text-text-muted">{operatorStatus(piece)}</p>
-            <p className="mt-1 text-text-primary">
-              {charLabel(piece.validation, piece.body)}
-              {typeof piece.validation?.qualityScore === "number"
-                ? ` · Q${piece.validation.qualityScore}`
-                : ""}
-            </p>
-          </div>
-        </div>
-      </header>
+    <article
+      id={`post-${piece.id}`}
+      className="scroll-mt-4 overflow-hidden rounded-md border border-border bg-bg-surface shadow-card"
+    >
+      <div className="grid xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0 p-4">
+          <header className="mb-3 flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-text-muted">
+                <span className="inline-flex min-h-7 items-center rounded-full bg-text-primary px-2.5 font-semibold text-bg-surface">
+                  {compactPlatform(piece.platform)}
+                </span>
+                <span>{pretty(piece.platform)}</span>
+                <span>{pretty(piece.level)}</span>
+                <span>{pretty(piece.format)}</span>
+                {piece.destination?.label && <span>To {piece.destination.label}</span>}
+              </div>
+              <h2 className="truncate text-base font-semibold text-text-primary">
+                {piece.title}
+              </h2>
+              <p className="mt-1 truncate text-xs text-text-muted">
+                {piece.content_runs?.name ?? "Untitled run"}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2 rounded-full border border-border-subtle bg-bg-elevated px-3 py-1.5 text-xs text-text-secondary">
+              <span className={`h-2 w-2 rounded-full ${statusDotClass(piece)}`} />
+              {operatorStatus(piece)}
+            </div>
+          </header>
 
-      <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="rounded-md border border-border-subtle bg-bg-primary p-4">
-          <p className="whitespace-pre-wrap text-[15px] leading-[1.6] text-text-primary">
-            {piece.body}
-          </p>
+          <div className="rounded-md border border-border-subtle bg-bg-primary shadow-inner">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-xs font-semibold text-accent-deep">
+                  {compactPlatform(piece.platform)}
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-text-primary">
+                    Post {index + 1}
+                  </p>
+                  <p className="text-xs text-text-muted">
+                    {piece.scheduled_for ? shortDateTime(piece.scheduled_for) : "Unscheduled"}
+                  </p>
+                </div>
+              </div>
+              <span className="rounded-full bg-bg-elevated px-2.5 py-1 text-xs text-text-secondary">
+                {charLabel(piece.validation, piece.body)}
+                {typeof piece.validation?.qualityScore === "number"
+                  ? ` · Q${piece.validation.qualityScore}`
+                  : ""}
+              </span>
+            </div>
+            <div className="max-h-[260px] overflow-y-auto px-4 py-4">
+              <p className="whitespace-pre-wrap text-[15px] leading-[1.55] text-text-primary">
+                {piece.body}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-3">
+        <aside className="border-t border-border-subtle bg-bg-elevated p-4 xl:border-l xl:border-t-0">
           {piece.metadata?.visualPrompt && piece.metadata.mediaType !== "none" && (
             <VisualBrief
               pieceId={piece.id}
@@ -306,7 +324,10 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
             />
           )}
 
-          <div className="flex flex-wrap items-center gap-3 rounded-md border border-border-subtle bg-bg-elevated p-3">
+          <div className="mt-3 rounded-md border border-border-subtle bg-bg-surface p-3">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">
+              Next action
+            </p>
             {canApprove && (
               <ApproveButton scope={{ pieceId: piece.id }}>
                 Approve & schedule
@@ -324,14 +345,14 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
               </a>
             )}
             {!canApprove && !canPost && !piece.posted_url && (
-              <span className="text-sm text-text-muted">
+              <span className="block text-sm leading-relaxed text-text-secondary">
                 {needsImage(piece)
                   ? "Upload image to unlock approval."
                   : "Already handled. Move to the next post."}
               </span>
             )}
           </div>
-        </div>
+        </aside>
       </div>
     </article>
   );
@@ -349,19 +370,20 @@ function VisualBrief({
   imageUrl?: string | null;
 }) {
   return (
-    <div className="rounded-md border border-border-subtle bg-bg-elevated p-3">
+    <div className="rounded-md border border-border-subtle bg-bg-surface p-3">
       <div className="mb-1 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-accent-deep">
-          Visual Brief
+          Image direction
         </span>
         <span className="rounded-sm bg-bg-surface px-2 py-0.5 text-[10px] uppercase tracking-wider text-text-muted">
           {pretty(mediaType)}
         </span>
       </div>
-      <p className="text-sm leading-relaxed text-text-secondary">{prompt}</p>
+      <p className="max-h-32 overflow-y-auto text-sm leading-relaxed text-text-secondary">
+        {prompt}
+      </p>
       <p className="mt-2 text-xs leading-relaxed text-text-muted">
-        Drop in the image you want paired with this post. Square or portrait is
-        safest. Once it is added, this post can move forward.
+        Drop in the image for this post. Square or portrait works best.
       </p>
       <MediaUploadButton pieceId={pieceId} initialUrl={imageUrl} />
     </div>
@@ -430,4 +452,15 @@ function charLabel(validation: PieceRow["validation"], body: string) {
   const max = validation?.maxChars;
   if (!max || max > 5000) return `${actual} chars`;
   return `${actual}/${max} chars`;
+}
+
+function shortDateTime(value: string) {
+  const date = new Date(value);
+  return `${date.toLocaleDateString([], {
+    month: "short",
+    day: "numeric",
+  })} · ${date.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  })}`;
 }
