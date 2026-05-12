@@ -90,11 +90,12 @@ export function LoginForm() {
           type="button"
           onClick={() => {
             setStatus("idle");
+            setMode("password");
             setError(null);
           }}
           className="mt-4 text-sm text-text-secondary hover:text-text-primary transition-colors"
         >
-          Use a different email
+          Use password instead
         </button>
       </div>
     );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createServerClient } from "@/lib/supabase/server";
+import { getAppContext } from "@/lib/app-auth";
 import { SignOutButton } from "@/components/sign-out-button";
 
 const NAV_ITEMS = [
@@ -16,11 +16,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { user, isTestBypass } = await getAppContext();
   if (!user) redirect("/login");
 
   return (
@@ -64,9 +60,9 @@ export default async function AppLayout({
         </nav>
         <div className="border-t border-border-subtle px-3 py-4">
           <div className="px-3 py-2 text-xs text-text-muted truncate">
-            {user.email}
+            {isTestBypass ? `Testing as ${user.email}` : user.email}
           </div>
-          <SignOutButton />
+          {!isTestBypass && <SignOutButton />}
         </div>
       </aside>
 
@@ -78,7 +74,7 @@ export default async function AppLayout({
           >
             IrieStack
           </Link>
-          <SignOutButton compact />
+          {!isTestBypass && <SignOutButton compact />}
         </header>
         <main className="container-shell py-8 sm:py-12">{children}</main>
       </div>

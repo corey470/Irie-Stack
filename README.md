@@ -26,6 +26,21 @@ npm run lint
 npm run build
 ```
 
+## Temporary testing login
+
+IrieStack can bypass email login while the product is still being tested. This is intentionally controlled by environment variables so it can be removed before customer launch.
+
+Required Vercel variables:
+
+```bash
+IRIE_STACK_TEST_BYPASS=true
+IRIE_STACK_TEST_BYPASS_ALLOW_PRODUCTION=true
+IRIE_STACK_TEST_USER_EMAIL=corey@irieswag.com
+SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+When those are present, `/login` shows a **Continue to IrieStack** testing button and `/app` loads as the configured test user. Remove `IRIE_STACK_TEST_BYPASS_ALLOW_PRODUCTION` before any public/customer-facing launch.
+
 ---
 
 ## The problem
