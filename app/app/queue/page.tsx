@@ -86,6 +86,7 @@ export default async function QueuePage({
         <div className="space-y-3">
           <NextActionPanel pieces={(pieces ?? []) as unknown as PieceRow[]} status={status} />
           <StatusNav status={status} />
+          <ReviewPlaylist pieces={(pieces ?? []) as unknown as PieceRow[]} />
           {((pieces ?? []) as unknown as PieceRow[]).map((piece) => (
             <QueuePiece key={piece.id} piece={piece} />
           ))}
@@ -126,6 +127,46 @@ function StatusNav({ status }: { status: string }) {
         </Link>
       ))}
     </nav>
+  );
+}
+
+function ReviewPlaylist({ pieces }: { pieces: PieceRow[] }) {
+  if (pieces.length === 0) return null;
+
+  return (
+    <section className="rounded-md border border-border bg-bg-surface p-3 shadow-card">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="workspace-kicker mb-1">Up next</p>
+          <h2 className="text-sm font-semibold text-text-primary">
+            Work through the next few posts.
+          </h2>
+        </div>
+        <span className="rounded-full bg-bg-elevated px-3 py-1 text-xs text-text-secondary">
+          {pieces.length} in this view
+        </span>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+        {pieces.slice(0, 5).map((piece) => (
+          <Link
+            key={piece.id}
+            href={`#post-${piece.id}`}
+            className="group min-w-0 rounded-md border border-border bg-bg-elevated p-3 transition-colors hover:border-border-strong hover:bg-bg-hover"
+          >
+            <div className="mb-2 flex min-w-0 items-center gap-2 text-[10px] uppercase tracking-wider text-text-muted">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${statusDotClass(piece)}`} />
+              <span className="shrink-0 font-semibold text-text-primary">
+                {compactPlatform(piece.platform)}
+              </span>
+              <span className="truncate">{operatorStatus(piece)}</span>
+            </div>
+            <p className="truncate text-sm font-medium text-text-primary">
+              {piece.title}
+            </p>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -347,6 +388,23 @@ function operatorStatus(piece: PieceRow) {
   if (piece.status === "posted") return "Posted";
   if (piece.status === "failed") return "Issue";
   return pretty(piece.status);
+}
+
+function statusDotClass(piece: PieceRow) {
+  if (piece.status === "posted") return "bg-accent-deep";
+  if (piece.status === "approved") return "bg-success";
+  if (piece.status === "failed") return "bg-destructive";
+  if (needsImage(piece)) return "bg-accent";
+  return "bg-text-muted";
+}
+
+function compactPlatform(value: string) {
+  if (value.toLowerCase() === "linkedin") return "In";
+  if (value.toLowerCase() === "instagram") return "IG";
+  if (value.toLowerCase() === "facebook") return "FB";
+  if (value.toLowerCase() === "threads") return "Th";
+  if (value.toLowerCase() === "tiktok") return "TT";
+  return pretty(value);
 }
 
 function statusLabel(value: string) {

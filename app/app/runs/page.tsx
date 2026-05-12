@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAppContext } from "@/lib/app-auth";
+import { CalendarBoard } from "./calendar-board";
 
 type RunRow = {
   id: string;
@@ -171,6 +172,7 @@ function EmptyCalendar() {
 function ActivePlanCalendar({ run, pieces }: { run: RunRow; pieces: PieceRow[] }) {
   const days = buildDays(run);
   const piecesByDate = groupPiecesByDate(pieces);
+  const calendarPiecesByDate = Object.fromEntries(piecesByDate);
   const needsImages = pieces.filter(needsImage).length;
   const readyToApprove = pieces.filter(
     (piece) =>
@@ -223,21 +225,12 @@ function ActivePlanCalendar({ run, pieces }: { run: RunRow; pieces: PieceRow[] }
         )}
       </header>
 
-      <div className="mt-3 md:hidden">
-        <MobileAgenda days={days} piecesByDate={piecesByDate} runId={run.id} />
-      </div>
-
-      <div className="mt-3 hidden overflow-x-auto pb-3 md:block">
-        <div className="grid min-w-[980px] grid-cols-7 gap-2">
-          {days.map((day) => (
-            <DayCell
-              key={day.key}
-              day={day}
-              pieces={piecesByDate.get(day.key) ?? []}
-              runId={run.id}
-            />
-          ))}
-        </div>
+      <div className="mt-3">
+        <CalendarBoard
+          days={days}
+          piecesByDate={calendarPiecesByDate}
+          runId={run.id}
+        />
       </div>
 
       <div className="mt-2 flex flex-wrap gap-2 text-xs text-text-muted">
@@ -247,158 +240,6 @@ function ActivePlanCalendar({ run, pieces }: { run: RunRow; pieces: PieceRow[] }
         <Legend label="Failed" className="bg-destructive/10 text-destructive" />
       </div>
     </section>
-  );
-}
-
-function DayCell({
-  day,
-  pieces,
-  runId,
-}: {
-  day: { key: string; dayNumber: number; label: string };
-  pieces: PieceRow[];
-  runId: string;
-}) {
-  return (
-    <article className="min-h-[118px] rounded-md border border-border bg-bg-surface p-2 shadow-card transition-colors hover:border-border-strong">
-      <header className="mb-2 flex items-baseline justify-between gap-2">
-        <div>
-          <div className="text-[10px] uppercase tracking-wider text-text-muted">
-            Day {day.dayNumber}
-          </div>
-          <div className="mt-0.5 text-sm font-medium text-text-primary">{day.label}</div>
-        </div>
-        <div className="text-xs text-text-muted">{pieces.length}</div>
-      </header>
-
-      <div className="space-y-1.5">
-        {pieces.slice(0, 4).map((piece) => (
-          <details
-            key={piece.id}
-            title={`${pretty(piece.platform)} · ${pretty(piece.status)} · ${formatTime(
-              piece.scheduled_for
-            )}\n${piece.title}\n\n${piece.body}`}
-            className={`rounded-md border text-xs leading-tight ${statusClass(
-              piece.status
-            )}`}
-          >
-            <summary className="flex min-h-8 cursor-pointer items-center gap-1.5 overflow-hidden whitespace-nowrap px-2 py-1 transition-colors hover:bg-bg-hover [&::-webkit-details-marker]:hidden">
-              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusDotClass(piece.status)}`} />
-              <span className="shrink-0 font-semibold">{compactPlatform(piece.platform)}</span>
-              <span className="shrink-0 text-text-muted">{compactDayPeriod(piece.scheduled_for)}</span>
-              <span className="min-w-0 truncate">{compactCalendarTitle(piece.title)}</span>
-            </summary>
-            <div className="border-t border-border-subtle bg-bg-surface p-2">
-              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-text-muted">
-                {operatorStatus(piece)}
-              </p>
-              <p className="mt-1 max-h-28 overflow-y-auto text-xs leading-relaxed text-text-primary">
-                {piece.body}
-              </p>
-              <Link
-                href={`/app/runs/${runId}#post-${piece.id}`}
-                className="mt-2 inline-flex min-h-8 items-center rounded-md border border-border bg-bg-elevated px-2 text-xs font-medium text-text-primary hover:bg-bg-hover"
-              >
-                Open full post
-              </Link>
-            </div>
-          </details>
-        ))}
-        {pieces.length > 4 && (
-          <Link
-            href={`/app/runs/${runId}#day-${day.key.replace(/[^a-zA-Z0-9-]/g, "-")}`}
-            className="block rounded-md border border-border bg-bg-elevated px-2 py-1.5 text-xs text-text-secondary hover:bg-bg-hover"
-          >
-            +{pieces.length - 4} more
-          </Link>
-        )}
-        {pieces.length === 0 && (
-          <p className="pt-3 text-xs text-text-muted">Quiet day.</p>
-        )}
-      </div>
-    </article>
-  );
-}
-
-function MobileAgenda({
-  days,
-  piecesByDate,
-  runId,
-}: {
-  days: { key: string; dayNumber: number; label: string }[];
-  piecesByDate: Map<string, PieceRow[]>;
-  runId: string;
-}) {
-  return (
-    <div className="space-y-3">
-      {days.map((day) => {
-        const pieces = piecesByDate.get(day.key) ?? [];
-        return (
-          <article
-            key={day.key}
-            className="rounded-md border border-border bg-bg-surface p-4 shadow-card"
-          >
-            <header className="mb-3 flex items-start justify-between gap-3">
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-text-muted">
-                  Day {day.dayNumber}
-                </div>
-                <h3 className="mt-0.5 text-base font-semibold text-text-primary">
-                  {day.label}
-                </h3>
-              </div>
-              <Link
-                href={`/app/runs/${runId}#day-${day.key.replace(/[^a-zA-Z0-9-]/g, "-")}`}
-                className="text-sm text-accent-deep underline underline-offset-2"
-              >
-                Open
-              </Link>
-            </header>
-            <div className="space-y-2">
-              {pieces.map((piece) => (
-                <details
-                  key={piece.id}
-                  className="rounded-md border border-border bg-bg-elevated text-sm"
-                >
-                  <summary className="cursor-pointer p-3 [&::-webkit-details-marker]:hidden">
-                    <div className="flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
-                      <span className={`h-2 w-2 shrink-0 rounded-full ${statusDotClass(piece.status)}`} />
-                      <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
-                        {compactPlatform(piece.platform)}
-                      </span>
-                      <span className="shrink-0 text-[10px] uppercase tracking-wider text-text-muted">
-                        {compactDayPeriod(piece.scheduled_for)}
-                      </span>
-                      <span className="truncate font-medium text-text-primary">
-                        {compactCalendarTitle(piece.title)}
-                      </span>
-                    </div>
-                  </summary>
-                  <div className="border-t border-border-subtle bg-bg-surface p-3">
-                    <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-wider text-text-muted">
-                      <span>{formatTime(piece.scheduled_for)}</span>
-                      <span>{operatorStatus(piece)}</span>
-                    </div>
-                    <p className="text-sm leading-relaxed text-text-primary">
-                      {piece.body}
-                    </p>
-                    <Link
-                      href={`/app/runs/${runId}#post-${piece.id}`}
-                      className="mt-3 inline-flex min-h-9 items-center rounded-md border border-border bg-bg-elevated px-3 text-xs font-medium text-text-primary"
-                    >
-                      Open full post
-                    </Link>
-                  </div>
-                </details>
-              ))}
-              {pieces.length === 0 && (
-                <p className="text-sm text-text-muted">Quiet day.</p>
-              )}
-            </div>
-          </article>
-        );
-      })}
-    </div>
   );
 }
 
@@ -483,33 +324,9 @@ function Legend({ label, className }: { label: string; className: string }) {
   );
 }
 
-function statusClass(status: string) {
-  if (status === "posted") return "border-accent bg-accent/20 text-text-primary";
-  if (status === "approved") return "border-success/30 bg-success/10 text-text-primary";
-  if (status === "failed") return "border-destructive/30 bg-destructive/10 text-destructive";
-  return "border-border bg-bg-elevated text-text-primary";
-}
-
-function statusDotClass(status: string) {
-  if (status === "posted") return "bg-accent-deep";
-  if (status === "approved") return "bg-success";
-  if (status === "failed") return "bg-destructive";
-  if (status === "pending_approval") return "bg-accent";
-  return "bg-text-muted";
-}
-
 function needsImage(piece: PieceRow) {
   const mediaType = piece.metadata?.mediaType;
   return Boolean(mediaType && mediaType !== "none" && !piece.metadata?.mediaAsset?.url);
-}
-
-function operatorStatus(piece: PieceRow) {
-  if (piece.status === "posted") return "Posted";
-  if (piece.status === "approved") return "Ready";
-  if (piece.status === "failed") return "Issue";
-  if (needsImage(piece)) return "Needs image";
-  if (piece.status === "pending_approval") return "Needs review";
-  return "Draft";
 }
 
 function pretty(value: string) {
@@ -517,41 +334,4 @@ function pretty(value: string) {
     .replace(/^x$/, "X")
     .replace(/_/g, " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function formatTime(value: string | null) {
-  if (!value) return "No time";
-  return new Date(value).toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function compactPlatform(value: string) {
-  if (value.toLowerCase() === "linkedin") return "In";
-  if (value.toLowerCase() === "instagram") return "IG";
-  if (value.toLowerCase() === "facebook") return "FB";
-  if (value.toLowerCase() === "threads") return "Th";
-  if (value.toLowerCase() === "tiktok") return "TT";
-  return pretty(value);
-}
-
-function compactDayPeriod(value: string | null) {
-  if (!value) return "";
-  const label = formatTime(value);
-  return label.match(/\b(AM|PM)\b/i)?.[0]?.toUpperCase() ?? "";
-}
-
-function compactCalendarTitle(title: string) {
-  const level = title.match(/\bL[123]\b/i)?.[0]?.toUpperCase();
-  let clean = title
-    .replace(/\s+[—-]\s+(Facebook|Instagram|LinkedIn|Threads|Tiktok|TikTok|X).*$/i, "")
-    .replace(/^(Facebook|Instagram|LinkedIn|Threads|Tiktok|TikTok|X)\s*[:—-]\s*/i, "")
-    .replace(/^L[123]\s*/i, "")
-    .replace(/^Core\s*[—:-]\s*/i, "Core ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (!clean) clean = "Post";
-  return [level, clean].filter(Boolean).join(" ");
 }
