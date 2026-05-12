@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createServerClient } from "@/lib/supabase/server";
+import { getAppContext } from "@/lib/app-auth";
 import { Generator } from "./generator";
 
 export default async function GeneratePage() {
-  const supabase = await createServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAppContext();
   if (!user) redirect("/login");
 
   const { data: stack } = await supabase
@@ -21,38 +18,37 @@ export default async function GeneratePage() {
   const stackHasVoice = (stack?.voice_notes ?? "").trim().length >= 40;
 
   return (
-    <div className="max-w-4xl">
-      <p className="mb-3 text-xs font-medium uppercase tracking-[0.22em] text-accent-deep">
-        Generate
-      </p>
-      <h1 className="font-display text-[clamp(2rem,4vw,2.75rem)] leading-tight text-text-primary">
-        One in. Many out.
-      </h1>
-      <p className="mt-3 max-w-2xl text-[clamp(1rem,1.4vw,1.125rem)] leading-relaxed text-text-secondary">
-        Paste a podcast clip transcript, a blog draft, a half-formed thought.
-        The system rewrites it for five platforms — in your voice from the
-        Stack.
-      </p>
+    <div className="workspace-page">
+      <header className="workspace-header">
+        <div>
+          <p className="workspace-kicker">Create Posts</p>
+          <h1 className="workspace-title">
+            Turn one source into a month of posts.
+          </h1>
+          <p className="workspace-copy">
+            Add a campaign draft, transcript, article, or rough thought. IrieStack
+            builds the 30-day plan, then you review, edit, add images, and approve.
+          </p>
+        </div>
+      </header>
 
       {!stackHasVoice && (
-        <div className="mt-6 rounded-md border border-border bg-bg-elevated p-4 text-sm text-text-secondary">
+        <div className="mb-4 rounded-md border border-border bg-bg-elevated p-4 text-sm text-text-secondary">
           <p>
-            Heads up: your Stack is empty (or very short). Output will sound
-            generic. Drop a few sentences about how you talk first —{" "}
+            Your voice notes are empty or short, so the posts may sound generic.
+            Add a few sentences about how you talk first —{" "}
             <Link
               href="/app/stack"
               className="font-medium text-accent-deep underline underline-offset-2"
             >
-              edit your Stack
+              edit your voice
             </Link>
             .
           </p>
         </div>
       )}
 
-      <div className="mt-10">
-        <Generator />
-      </div>
+      <Generator />
     </div>
   );
 }

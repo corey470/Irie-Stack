@@ -2,13 +2,41 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAppContext } from "@/lib/app-auth";
 import { SignOutButton } from "@/components/sign-out-button";
+import { MobileNav } from "./mobile-nav";
+import { NavItemLink } from "./nav-item-link";
 
-const NAV_ITEMS = [
-  { label: "Dashboard", href: "/app", icon: DashboardIcon },
-  { label: "Stack", href: "/app/stack", icon: StackIcon },
-  { label: "Generate", href: "/app/generate", icon: GenerateIcon },
-  { label: "Review", href: "/app", icon: ReviewIcon, disabled: true },
-  { label: "Settings", href: "/app", icon: SettingsIcon, disabled: true },
+type NavItem = {
+  label: string;
+  href: string;
+  icon: (props: { active?: boolean }) => React.ReactNode;
+  disabled?: boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "Today", href: "/app", icon: DashboardIcon },
+  { label: "Content Fuel", href: "/app/research", icon: ResearchIcon },
+  { label: "Create Plan", href: "/app/generate", icon: GenerateIcon },
+  { label: "Plan Calendar", href: "/app/runs", icon: RunsIcon },
+  { label: "Review Inbox", href: "/app/queue", icon: ReviewIcon },
+  { label: "Delivery Queue", href: "/app/relay", icon: RelayIcon },
+  { label: "Setup", href: "/onboarding", icon: OnboardingIcon },
+  { label: "Your Voice", href: "/app/stack", icon: StackIcon },
+  { label: "Settings", href: "/app/settings", icon: SettingsIcon },
+];
+
+const NAV_GROUPS = [
+  {
+    label: "Build",
+    items: NAV_ITEMS.slice(0, 4),
+  },
+  {
+    label: "Operate",
+    items: NAV_ITEMS.slice(4, 6),
+  },
+  {
+    label: "Configure",
+    items: NAV_ITEMS.slice(6),
+  },
 ];
 
 export default async function AppLayout({
@@ -21,44 +49,51 @@ export default async function AppLayout({
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      <aside className="hidden md:flex md:w-[248px] fixed inset-y-0 left-0 flex-col bg-bg-sidebar shadow-sidebar">
-        <div className="px-6 py-6">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-bg-surface focus:px-4 focus:py-3 focus:text-sm focus:font-medium focus:text-text-primary focus:shadow-modal"
+      >
+        Skip to main content
+      </a>
+      <aside className="fixed inset-y-0 left-0 hidden w-[260px] flex-col bg-bg-sidebar shadow-sidebar md:flex">
+        <div className="px-5 py-5">
           <Link
             href="/app"
             className="font-display text-xl tracking-tight text-text-primary"
           >
             IrieStack
           </Link>
+          <p className="mt-1 text-xs leading-relaxed text-text-muted">
+            Content engine cockpit
+          </p>
         </div>
-        <nav className="flex-1 px-3">
-          <ul className="space-y-1">
-            {NAV_ITEMS.map((item) => (
-              <li key={item.label}>
-                {item.disabled ? (
-                  <span
-                    aria-disabled="true"
-                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-text-muted cursor-not-allowed"
-                  >
-                    <item.icon />
-                    <span>{item.label}</span>
-                    <span className="ml-auto text-[10px] uppercase tracking-wider text-text-faint">
-                      Soon
+        <nav className="flex-1 px-3" aria-label="Primary navigation">
+          {NAV_GROUPS.map((group) => (
+            <NavGroup key={group.label} label={group.label}>
+              {group.items.map((item) => (
+                <li key={item.label}>
+                  {item.disabled ? (
+                    <span className="flex min-h-10 cursor-not-allowed items-center gap-3 rounded-md px-3 py-2 text-sm text-text-muted">
+                      <item.icon />
+                      <span>{item.label}</span>
                     </span>
-                  </span>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-text-primary bg-bg-hover transition-colors duration-150"
-                  >
-                    <item.icon active />
-                    <span>{item.label}</span>
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
+                  ) : (
+                    <NavItemLink href={item.href} label={item.label}>
+                      <item.icon />
+                    </NavItemLink>
+                  )}
+                </li>
+              ))}
+            </NavGroup>
+          ))}
         </nav>
         <div className="border-t border-border-subtle px-3 py-4">
+          <Link
+            href="/app/generate"
+            className="mb-3 flex min-h-11 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary shadow-card transition-colors hover:bg-accent-light"
+          >
+            Create plan
+          </Link>
           <div className="px-3 py-2 text-xs text-text-muted truncate">
             {isTestBypass ? `Testing as ${user.email}` : user.email}
           </div>
@@ -66,18 +101,38 @@ export default async function AppLayout({
         </div>
       </aside>
 
-      <div className="md:pl-[248px]">
-        <header className="md:hidden flex items-center justify-between bg-bg-surface px-4 py-3 shadow-topbar">
+      <div className="md:pl-[260px]">
+        <header className="md:hidden sticky top-0 z-30 flex items-center justify-between bg-bg-surface px-4 py-3 shadow-topbar">
           <Link
             href="/app"
             className="font-display text-lg tracking-tight text-text-primary"
           >
             IrieStack
           </Link>
-          {!isTestBypass && <SignOutButton compact />}
+          <span className="text-xs font-medium text-text-muted">Cockpit</span>
         </header>
-        <main className="container-shell py-8 sm:py-12">{children}</main>
+        <MobileNav showSignOut={!isTestBypass} />
+        <main id="main-content" className="workspace-shell">
+          {children}
+        </main>
       </div>
+    </div>
+  );
+}
+
+function NavGroup({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mb-5">
+      <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">
+        {label}
+      </p>
+      <ul className="space-y-1">{children}</ul>
     </div>
   );
 }
@@ -122,6 +177,26 @@ function StackIcon() {
     </svg>
   );
 }
+function OnboardingIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 4h14" />
+      <path d="M5 12h14" />
+      <path d="M5 20h8" />
+      <path d="m15 18 2 2 4-4" />
+    </svg>
+  );
+}
 function GenerateIcon() {
   return (
     <svg
@@ -143,6 +218,48 @@ function GenerateIcon() {
     </svg>
   );
 }
+function ResearchIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M10 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z" />
+      <path d="m15 15 5 5" />
+      <path d="M7.5 9.5h5" />
+      <path d="M10 7v5" />
+    </svg>
+  );
+}
+function RunsIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 5h16" />
+      <path d="M4 12h16" />
+      <path d="M4 19h16" />
+      <path d="M7 3v4" />
+      <path d="M7 10v4" />
+      <path d="M7 17v4" />
+    </svg>
+  );
+}
 function ReviewIcon() {
   return (
     <svg
@@ -160,6 +277,26 @@ function ReviewIcon() {
       <path d="M3 12h13" />
       <path d="M3 19h7" />
       <path d="m16 16 2 2 4-4" />
+    </svg>
+  );
+}
+function RelayIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 12h12" />
+      <path d="m12 6 6 6-6 6" />
+      <path d="M4 6h4" />
+      <path d="M4 18h4" />
     </svg>
   );
 }
