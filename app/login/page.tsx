@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { LoginForm } from "@/components/login-form";
-import { testBypassEmail, testBypassReady } from "@/lib/app-auth";
+import { testBypassEmail, testBypassReady, testBypassRequiresKey } from "@/lib/app-auth";
 
 export default function LoginPage() {
   const bypassEmail = testBypassEmail();
   const bypassReady = testBypassReady();
+  const bypassNeedsKey = testBypassRequiresKey();
 
   return (
     <main className="min-h-screen bg-bg-marketing flex flex-col">
@@ -37,18 +38,39 @@ export default function LoginPage() {
                 Skip email login for now.
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                Open the cockpit as{" "}
+                Open the private test workspace as{" "}
                 <span className="font-medium text-text-primary">
                   {bypassEmail}
                 </span>
-                . This is temporary while we test the product.
+                .{" "}
+                {bypassNeedsKey
+                  ? "Enter the testing key first so the live app is not open to everyone."
+                  : "This is temporary while we test the product."}
               </p>
-              <Link
-                href="/app"
-                className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-md bg-accent px-5 text-sm font-semibold text-text-primary transition-colors hover:bg-accent-light"
-              >
-                Continue to IrieStack
-              </Link>
+              {bypassNeedsKey ? (
+                <form action="/auth/test-bypass" className="mt-4 space-y-3">
+                  <input
+                    name="key"
+                    type="password"
+                    autoComplete="off"
+                    placeholder="Testing key"
+                    className="h-11 w-full rounded-md border border-border bg-bg-surface px-3 text-[15px] text-text-primary placeholder:text-text-muted focus:border-accent"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex h-11 w-full items-center justify-center rounded-md bg-accent px-5 text-sm font-semibold text-text-primary transition-colors hover:bg-accent-light"
+                  >
+                    Continue to IrieStack
+                  </button>
+                </form>
+              ) : (
+                <Link
+                  href="/app"
+                  className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-md bg-accent px-5 text-sm font-semibold text-text-primary transition-colors hover:bg-accent-light"
+                >
+                  Continue to IrieStack
+                </Link>
+              )}
             </div>
           )}
           {!bypassReady && bypassEmail && (

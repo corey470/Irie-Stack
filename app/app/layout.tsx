@@ -14,28 +14,22 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Today", href: "/app", icon: DashboardIcon },
-  { label: "Content Fuel", href: "/app/research", icon: ResearchIcon },
-  { label: "Create Plan", href: "/app/generate", icon: GenerateIcon },
-  { label: "Plan Calendar", href: "/app/runs", icon: RunsIcon },
-  { label: "Review Inbox", href: "/app/queue", icon: ReviewIcon },
-  { label: "Delivery Queue", href: "/app/relay", icon: RelayIcon },
-  { label: "Setup", href: "/onboarding", icon: OnboardingIcon },
-  { label: "Your Voice", href: "/app/stack", icon: StackIcon },
+  { label: "Build Month", href: "/app/research", icon: ResearchIcon },
+  { label: "Calendar", href: "/app/runs", icon: RunsIcon },
+  { label: "Approve", href: "/app/queue", icon: ReviewIcon },
+  { label: "Publish", href: "/app/relay", icon: RelayIcon },
+  { label: "Voice", href: "/app/stack", icon: StackIcon },
   { label: "Settings", href: "/app/settings", icon: SettingsIcon },
 ];
 
 const NAV_GROUPS = [
   {
-    label: "Build",
-    items: NAV_ITEMS.slice(0, 4),
+    label: "Run the Month",
+    items: NAV_ITEMS.slice(0, 5),
   },
   {
-    label: "Operate",
-    items: NAV_ITEMS.slice(4, 6),
-  },
-  {
-    label: "Configure",
-    items: NAV_ITEMS.slice(6),
+    label: "Tune",
+    items: NAV_ITEMS.slice(5),
   },
 ];
 
@@ -64,7 +58,7 @@ export default async function AppLayout({
             IrieStack
           </Link>
           <p className="mt-1 text-xs leading-relaxed text-text-muted">
-            Content engine cockpit
+            Your 30-day content engine
           </p>
         </div>
         <nav className="flex-1 px-3" aria-label="Primary navigation">
@@ -89,10 +83,10 @@ export default async function AppLayout({
         </nav>
         <div className="border-t border-border-subtle px-3 py-4">
           <Link
-            href="/app/generate"
+            href="/app/research"
             className="mb-3 flex min-h-11 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary shadow-card transition-colors hover:bg-accent-light"
           >
-            Create plan
+            Build month
           </Link>
           <div className="px-3 py-2 text-xs text-text-muted truncate">
             {isTestBypass ? `Testing as ${user.email}` : user.email}
@@ -109,7 +103,7 @@ export default async function AppLayout({
           >
             IrieStack
           </Link>
-          <span className="text-xs font-medium text-text-muted">Cockpit</span>
+          <span className="text-xs font-medium text-text-muted">30-day run</span>
         </header>
         <MobileNav showSignOut={!isTestBypass} />
         <main id="main-content" className="workspace-shell">
@@ -174,47 +168,6 @@ function StackIcon() {
       <path d="M12 3 2 8l10 5 10-5-10-5Z" />
       <path d="M2 13l10 5 10-5" />
       <path d="M2 18l10 5 10-5" />
-    </svg>
-  );
-}
-function OnboardingIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 4h14" />
-      <path d="M5 12h14" />
-      <path d="M5 20h8" />
-      <path d="m15 18 2 2 4-4" />
-    </svg>
-  );
-}
-function GenerateIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 3v4" />
-      <path d="M3 5h4" />
-      <path d="M19 17v4" />
-      <path d="M17 19h4" />
-      <path d="M11 3l2.5 6.5L20 12l-6.5 2.5L11 21l-2.5-6.5L2 12l6.5-2.5L11 3Z" />
     </svg>
   );
 }

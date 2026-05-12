@@ -1,4 +1,5 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import { adminClientIsConfigured, createAdminClient } from "@/lib/supabase/admin";
 import { createServerClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,9 @@ export async function getAppContext(): Promise<{
 
   if (user) return { supabase, user, isTestBypass: false };
   if (!testBypassEnabled()) return { supabase, user: null, isTestBypass: false };
+  if (!(await testBypassAccessGranted())) {
+    return { supabase, user: null, isTestBypass: false };
+  }
   if (!adminClientIsConfigured()) return { supabase, user: null, isTestBypass: false };
 
   const admin = createAdminClient();
@@ -32,6 +36,18 @@ export function testBypassEnabled() {
     return false;
   }
   return true;
+}
+
+export function testBypassRequiresKey() {
+  return Boolean(process.env.IRIE_STACK_TEST_BYPASS_KEY);
+}
+
+export async function testBypassAccessGranted() {
+  const key = process.env.IRIE_STACK_TEST_BYPASS_KEY;
+  if (!key) return true;
+
+  const cookieStore = await cookies();
+  return cookieStore.get("iriestack_test_key")?.value === key;
 }
 
 export function testBypassEmail() {

@@ -60,17 +60,18 @@ export default async function RunsPage() {
     <div className="workspace-page">
       <header className="workspace-header">
         <div>
-          <p className="workspace-kicker">Plans</p>
-          <h1 className="workspace-title">Your 30-day posting calendar.</h1>
+          <p className="workspace-kicker">Calendar</p>
+          <h1 className="workspace-title">Your content map.</h1>
           <p className="workspace-copy">
-            See the month by day: platform, time, status, and what needs attention.
+            A month of posts, laid out by day. Click a post chip to open the copy,
+            image need, and next action.
           </p>
         </div>
         <Link
-          href="/app/generate"
+          href="/app/research"
           className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary transition-colors hover:bg-accent-light"
         >
-          Create Posts
+          Build month
         </Link>
       </header>
 
@@ -82,7 +83,7 @@ export default async function RunsPage() {
         ) : !activeRun ? (
           <EmptyCalendar />
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             <ActivePlanCalendar run={activeRun} pieces={(pieces ?? []) as PieceRow[]} />
             {typedRuns.length > 1 && <OlderPlans runs={typedRuns.slice(1)} />}
           </div>
@@ -111,10 +112,10 @@ function EmptyCalendar() {
           </p>
         </div>
         <Link
-          href="/app/generate"
+          href="/app/research"
           className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary transition-colors hover:bg-accent/80"
         >
-          Create Posts
+          Build month
         </Link>
       </header>
 
@@ -184,42 +185,49 @@ function ActivePlanCalendar({ run, pieces }: { run: RunRow; pieces: PieceRow[] }
 
   return (
     <section>
-      <header className="flex flex-wrap items-start justify-between gap-4 rounded-md border border-border bg-bg-surface p-4 shadow-card">
-        <div>
-          <p className="mb-2 text-xs uppercase tracking-[0.18em] text-text-muted">
-            Current plan · {sourceLabel}
-          </p>
-          <Link
-            href={`/app/runs/${run.id}`}
-            className="font-display text-[clamp(1.5rem,3vw,2rem)] leading-tight text-text-primary underline decoration-border-strong underline-offset-4"
-          >
-            {run.name}
-          </Link>
-          {run.summary && (
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary">
-              {run.summary}
+      <header className="rounded-md border border-border bg-bg-surface p-3 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="mb-1 text-[10px] uppercase tracking-[0.16em] text-text-muted">
+              Current plan · {sourceLabel}
             </p>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center justify-start gap-2 text-xs uppercase tracking-wider text-text-muted sm:justify-end">
-          <div>{pretty(run.status)}</div>
-          <div>{pieces.length} posts</div>
-          <div>{readyToApprove} ready</div>
-          <div>{needsImages} need images</div>
+            <Link
+              href={`/app/runs/${run.id}`}
+              className="block truncate text-lg font-semibold leading-tight text-text-primary underline decoration-border-strong underline-offset-4"
+            >
+              {run.name}
+            </Link>
+          </div>
           <Link
             href={`/app/runs/${run.id}`}
-            className="inline-flex min-h-10 items-center rounded-md bg-accent px-3 text-sm normal-case tracking-normal text-text-primary hover:bg-accent/80"
+            className="inline-flex min-h-10 items-center rounded-md bg-accent px-3 text-sm text-text-primary hover:bg-accent/80"
           >
             Review plan
           </Link>
         </div>
+        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+          <PlanStat label="Status" value={pretty(run.status)} />
+          <PlanStat label="Posts" value={pieces.length.toString()} />
+          <PlanStat label="Ready" value={readyToApprove.toString()} />
+          <PlanStat label="Need images" value={needsImages.toString()} />
+        </div>
+        {run.summary && (
+          <details className="mt-2">
+            <summary className="cursor-pointer text-xs font-medium text-accent-deep">
+              Plan notes
+            </summary>
+            <p className="mt-2 max-w-4xl text-sm leading-relaxed text-text-secondary">
+              {run.summary}
+            </p>
+          </details>
+        )}
       </header>
 
-      <div className="mt-5 md:hidden">
+      <div className="mt-3 md:hidden">
         <MobileAgenda days={days} piecesByDate={piecesByDate} runId={run.id} />
       </div>
 
-      <div className="mt-4 hidden overflow-x-auto pb-3 md:block">
+      <div className="mt-3 hidden overflow-x-auto pb-3 md:block">
         <div className="grid min-w-[980px] grid-cols-7 gap-2">
           {days.map((day) => (
             <DayCell
@@ -232,7 +240,7 @@ function ActivePlanCalendar({ run, pieces }: { run: RunRow; pieces: PieceRow[] }
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2 text-xs text-text-muted">
+      <div className="mt-2 flex flex-wrap gap-2 text-xs text-text-muted">
         <Legend label="Draft" className="bg-bg-elevated" />
         <Legend label="Approved" className="bg-success/10 text-success" />
         <Legend label="Posted" className="bg-accent/20 text-text-primary" />
@@ -252,8 +260,8 @@ function DayCell({
   runId: string;
 }) {
   return (
-    <article className="min-h-[132px] rounded-md border border-border bg-bg-surface p-3 shadow-card">
-      <header className="mb-3 flex items-baseline justify-between gap-2">
+    <article className="min-h-[118px] rounded-md border border-border bg-bg-surface p-2 shadow-card transition-colors hover:border-border-strong">
+      <header className="mb-2 flex items-baseline justify-between gap-2">
         <div>
           <div className="text-[10px] uppercase tracking-wider text-text-muted">
             Day {day.dayNumber}
@@ -265,22 +273,36 @@ function DayCell({
 
       <div className="space-y-1.5">
         {pieces.slice(0, 4).map((piece) => (
-          <Link
+          <details
             key={piece.id}
-            href={`/app/runs/${runId}#post-${piece.id}`}
             title={`${pretty(piece.platform)} · ${pretty(piece.status)} · ${formatTime(
               piece.scheduled_for
             )}\n${piece.title}\n\n${piece.body}`}
-            className={`block max-h-10 overflow-hidden rounded-md border px-2 py-1 text-xs leading-tight transition-colors hover:bg-bg-hover ${statusClass(
+            className={`rounded-md border text-xs leading-tight ${statusClass(
               piece.status
             )}`}
           >
-            <span className="font-semibold">{pretty(piece.platform)}</span>
-            <span className="mx-1 text-text-muted">·</span>
-            <span className="text-text-muted">{formatTime(piece.scheduled_for)}</span>
-            <span className="mx-1 text-text-muted">·</span>
-            <span>{piece.title}</span>
-          </Link>
+            <summary className="flex min-h-8 cursor-pointer items-center gap-1.5 overflow-hidden whitespace-nowrap px-2 py-1 transition-colors hover:bg-bg-hover [&::-webkit-details-marker]:hidden">
+              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusDotClass(piece.status)}`} />
+              <span className="shrink-0 font-semibold">{compactPlatform(piece.platform)}</span>
+              <span className="shrink-0 text-text-muted">{compactDayPeriod(piece.scheduled_for)}</span>
+              <span className="min-w-0 truncate">{compactCalendarTitle(piece.title)}</span>
+            </summary>
+            <div className="border-t border-border-subtle bg-bg-surface p-2">
+              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-text-muted">
+                {operatorStatus(piece)}
+              </p>
+              <p className="mt-1 max-h-28 overflow-y-auto text-xs leading-relaxed text-text-primary">
+                {piece.body}
+              </p>
+              <Link
+                href={`/app/runs/${runId}#post-${piece.id}`}
+                className="mt-2 inline-flex min-h-8 items-center rounded-md border border-border bg-bg-elevated px-2 text-xs font-medium text-text-primary hover:bg-bg-hover"
+              >
+                Open full post
+              </Link>
+            </div>
+          </details>
         ))}
         {pieces.length > 4 && (
           <Link
@@ -291,7 +313,7 @@ function DayCell({
           </Link>
         )}
         {pieces.length === 0 && (
-          <p className="pt-3 text-xs text-text-muted">No posts planned.</p>
+          <p className="pt-3 text-xs text-text-muted">Quiet day.</p>
         )}
       </div>
     </article>
@@ -334,21 +356,43 @@ function MobileAgenda({
             </header>
             <div className="space-y-2">
               {pieces.map((piece) => (
-                <Link
+                <details
                   key={piece.id}
-                  href={`/app/runs/${runId}#post-${piece.id}`}
-                  className="block rounded-md border border-border bg-bg-elevated p-3 text-sm"
+                  className="rounded-md border border-border bg-bg-elevated text-sm"
                 >
-                  <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-wider text-text-muted">
-                    <span>{pretty(piece.platform)}</span>
-                    <span>{formatTime(piece.scheduled_for)}</span>
-                    <span>{operatorStatus(piece)}</span>
+                  <summary className="cursor-pointer p-3 [&::-webkit-details-marker]:hidden">
+                    <div className="flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${statusDotClass(piece.status)}`} />
+                      <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                        {compactPlatform(piece.platform)}
+                      </span>
+                      <span className="shrink-0 text-[10px] uppercase tracking-wider text-text-muted">
+                        {compactDayPeriod(piece.scheduled_for)}
+                      </span>
+                      <span className="truncate font-medium text-text-primary">
+                        {compactCalendarTitle(piece.title)}
+                      </span>
+                    </div>
+                  </summary>
+                  <div className="border-t border-border-subtle bg-bg-surface p-3">
+                    <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-wider text-text-muted">
+                      <span>{formatTime(piece.scheduled_for)}</span>
+                      <span>{operatorStatus(piece)}</span>
+                    </div>
+                    <p className="text-sm leading-relaxed text-text-primary">
+                      {piece.body}
+                    </p>
+                    <Link
+                      href={`/app/runs/${runId}#post-${piece.id}`}
+                      className="mt-3 inline-flex min-h-9 items-center rounded-md border border-border bg-bg-elevated px-3 text-xs font-medium text-text-primary"
+                    >
+                      Open full post
+                    </Link>
                   </div>
-                  <div className="font-medium text-text-primary">{piece.title}</div>
-                </Link>
+                </details>
               ))}
               {pieces.length === 0 && (
-                <p className="text-sm text-text-muted">No posts planned.</p>
+                <p className="text-sm text-text-muted">Quiet day.</p>
               )}
             </div>
           </article>
@@ -360,22 +404,24 @@ function MobileAgenda({
 
 function OlderPlans({ runs }: { runs: RunRow[] }) {
   return (
-    <section>
-      <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-accent-deep">
+    <details className="rounded-md border border-border bg-bg-surface p-3 shadow-card">
+      <summary className="cursor-pointer text-sm font-medium text-accent-deep">
         Older plans
-      </h2>
-      <div className="space-y-3">
+      </summary>
+      <div className="mt-3 space-y-2">
         {runs.map((run) => (
           <Link
             key={run.id}
             href={`/app/runs/${run.id}`}
-            className="block rounded-md border border-border bg-bg-surface p-4 shadow-card transition-colors hover:bg-bg-hover"
+            className="block rounded-md border border-border bg-bg-elevated p-3 transition-colors hover:bg-bg-hover"
           >
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h3 className="text-sm font-semibold text-text-primary">{run.name}</h3>
                 {run.summary && (
-                  <p className="mt-1 max-w-2xl text-sm text-text-secondary">{run.summary}</p>
+                  <p className="mt-1 max-h-10 max-w-2xl overflow-hidden text-sm text-text-secondary">
+                    {run.summary}
+                  </p>
                 )}
               </div>
               <div className="text-xs uppercase tracking-wider text-text-muted">
@@ -385,7 +431,18 @@ function OlderPlans({ runs }: { runs: RunRow[] }) {
           </Link>
         ))}
       </div>
-    </section>
+    </details>
+  );
+}
+
+function PlanStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-border-subtle bg-bg-elevated px-3 py-2">
+      <div className="font-semibold text-text-primary">{value}</div>
+      <div className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-text-muted">
+        {label}
+      </div>
+    </div>
   );
 }
 
@@ -433,6 +490,14 @@ function statusClass(status: string) {
   return "border-border bg-bg-elevated text-text-primary";
 }
 
+function statusDotClass(status: string) {
+  if (status === "posted") return "bg-accent-deep";
+  if (status === "approved") return "bg-success";
+  if (status === "failed") return "bg-destructive";
+  if (status === "pending_approval") return "bg-accent";
+  return "bg-text-muted";
+}
+
 function needsImage(piece: PieceRow) {
   const mediaType = piece.metadata?.mediaType;
   return Boolean(mediaType && mediaType !== "none" && !piece.metadata?.mediaAsset?.url);
@@ -460,4 +525,33 @@ function formatTime(value: string | null) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+function compactPlatform(value: string) {
+  if (value.toLowerCase() === "linkedin") return "In";
+  if (value.toLowerCase() === "instagram") return "IG";
+  if (value.toLowerCase() === "facebook") return "FB";
+  if (value.toLowerCase() === "threads") return "Th";
+  if (value.toLowerCase() === "tiktok") return "TT";
+  return pretty(value);
+}
+
+function compactDayPeriod(value: string | null) {
+  if (!value) return "";
+  const label = formatTime(value);
+  return label.match(/\b(AM|PM)\b/i)?.[0]?.toUpperCase() ?? "";
+}
+
+function compactCalendarTitle(title: string) {
+  const level = title.match(/\bL[123]\b/i)?.[0]?.toUpperCase();
+  let clean = title
+    .replace(/\s+[—-]\s+(Facebook|Instagram|LinkedIn|Threads|Tiktok|TikTok|X).*$/i, "")
+    .replace(/^(Facebook|Instagram|LinkedIn|Threads|Tiktok|TikTok|X)\s*[:—-]\s*/i, "")
+    .replace(/^L[123]\s*/i, "")
+    .replace(/^Core\s*[—:-]\s*/i, "Core ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!clean) clean = "Post";
+  return [level, clean].filter(Boolean).join(" ");
 }

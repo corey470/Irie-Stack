@@ -21,13 +21,13 @@ export default async function GeneratePage() {
     <div className="workspace-page">
       <header className="workspace-header">
         <div>
-          <p className="workspace-kicker">Create Posts</p>
+          <p className="workspace-kicker">Create</p>
           <h1 className="workspace-title">
-            Turn one source into a month of posts.
+            Build the 30-day calendar.
           </h1>
           <p className="workspace-copy">
-            Add a campaign draft, transcript, article, or rough thought. IrieStack
-            builds the 30-day plan, then you review, edit, add images, and approve.
+            Drop in the source. The engine handles the platform formatting,
+            schedule, visual briefs, and review list.
           </p>
         </div>
       </header>

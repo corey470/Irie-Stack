@@ -35,6 +35,9 @@ const CAMPAIGN_TEMPLATES = [
   "Product story",
 ];
 
+const COREY_EXAMPLE =
+  "I want a month of posts explaining why booking with a local owner-operator is better than gambling on Uber or Lyft for airport rides.";
+
 export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("campaign");
@@ -50,7 +53,7 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
     {
       role: "assistant",
       content:
-        "Tell me the rough campaign idea. You can say it like you would in a text message, and I’ll turn it into a usable campaign brief.",
+        "Say what you want this month to be about. Keep it messy. I will turn it into a usable campaign brief.",
     },
   ]);
   const [campaignInput, setCampaignInput] = useState("");
@@ -207,23 +210,23 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(360px,0.9fr)_minmax(420px,1.1fr)]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(360px,0.82fr)_minmax(420px,1.18fr)]">
       <section className="rounded-md border border-border bg-bg-surface shadow-card">
         <div className="border-b border-border-subtle p-4">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent-deep">
             Start here
           </p>
           <h2 className="mt-1 text-xl font-semibold text-text-primary">
-            Build the source before the posts.
+            What should this month do?
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-            Pick the kind of content, answer a few plain questions, and IrieStack
-            will make the source draft.
+            Bring in customers, explain an offer, build trust, answer questions,
+            or launch something new.
           </p>
         </div>
 
         <div className="p-4">
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-3 flex flex-wrap gap-2">
           {(["campaign", "url", "topic"] as const).map((item) => (
             <button
               key={item}
@@ -238,14 +241,14 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
                   : "border-border bg-bg-surface text-text-secondary hover:bg-bg-hover"
               }`}
             >
-              {item === "campaign" ? "Campaign" : item === "url" ? "URL" : "Topic"}
+              {item === "campaign" ? "Talk it out" : item === "url" ? "Use a link" : "Use a topic"}
             </button>
           ))}
         </div>
 
         {mode === "campaign" ? (
-          <div className="space-y-4">
-            <div className="space-y-3 rounded-md border border-border bg-bg-primary p-3">
+          <div className="space-y-3">
+            <div className="max-h-32 space-y-2 overflow-y-auto rounded-md border border-border bg-bg-primary p-3">
               {campaignMessages.map((message, index) => (
                 <div
                   key={`${message.role}-${index}`}
@@ -273,14 +276,14 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
               className="rounded-md border border-border bg-bg-surface p-3 shadow-card"
             >
               <label htmlFor="campaign-chat" className="mb-2 block text-sm font-medium text-text-primary">
-                Talk it out
+                Type the rough idea
               </label>
               <textarea
                 id="campaign-chat"
-                rows={3}
+                rows={2}
                 value={campaignInput}
                 onChange={(event) => setCampaignInput(event.target.value)}
-                placeholder='Example: I want a campaign about the benefits of an owner-operator ride service versus Uber or Lyft.'
+                placeholder="Example: I want posts about why my service is safer, simpler, or more trustworthy than the usual option."
                 className="w-full resize-y rounded-md border border-border bg-bg-surface px-4 py-3 text-[15px] leading-[1.6] text-text-primary shadow-card placeholder:text-text-muted focus:border-accent"
               />
               <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -295,18 +298,22 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
                   type="button"
                   onClick={() =>
                     sendCampaignMessage(
-                      "I want a campaign about the benefits of an owner-operator ride service versus Uber or Lyft."
+                      COREY_EXAMPLE
                     )
                   }
                   disabled={campaignChatStatus === "thinking"}
                   className="min-h-11 rounded-md border border-border bg-bg-elevated px-4 text-sm text-text-primary transition-colors hover:bg-bg-hover disabled:opacity-50"
                 >
-                  Try Corey example
+                  Try example
                 </button>
               </div>
             </form>
 
-            <div className="rounded-md border border-border-subtle bg-bg-elevated p-3">
+            <details className="rounded-md border border-border-subtle bg-bg-elevated">
+              <summary className="cursor-pointer list-none p-3 text-sm font-medium text-accent-deep">
+                View the brief IrieStack is building
+              </summary>
+              <div className="border-t border-border-subtle p-3">
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-xs font-medium uppercase tracking-[0.16em] text-text-muted">
                   Campaign brief
@@ -323,7 +330,8 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
               <BriefLine label="Next step" value={campaignOffer} />
               <BriefLine label="Proof" value={campaignProof} />
               <BriefLine label="Take" value={campaignPointOfView} />
-            </div>
+              </div>
+            </details>
           </div>
         ) : mode === "url" ? (
           <div>
@@ -355,12 +363,6 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
           </div>
         )}
 
-        <p className="mt-4 text-xs leading-relaxed text-text-muted">
-          Campaigns create an original source draft first. URLs and topics become
-          research fuel. Either way, IrieStack uses this as source material for the
-          30-day plan.
-        </p>
-
           <div className="-mx-4 mt-4 border-t border-border-subtle bg-bg-surface/95 px-4 py-3 backdrop-blur md:sticky md:bottom-0">
             <button
               type="button"
@@ -368,8 +370,12 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
               disabled={status === "working"}
               className="h-12 w-full rounded-md bg-accent px-5 text-sm font-medium text-text-primary shadow-card transition-colors hover:bg-accent-light disabled:opacity-60 sm:w-auto"
             >
-              {status === "working" ? "Building..." : mode === "campaign" ? "Build Source Draft" : "Build Content Fuel"}
+              {status === "working" ? "Building..." : mode === "campaign" ? "Build the source" : "Build the source"}
             </button>
+            <p className="mt-2 text-xs leading-relaxed text-text-muted">
+              This makes the source. The next screen turns it into the 30-day
+              calendar.
+            </p>
           </div>
 
         {error && (
@@ -382,14 +388,14 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
 
       <section className="rounded-md border border-border bg-bg-surface p-5 shadow-card lg:sticky lg:top-4 lg:self-start">
         {!fuel ? (
-          <div className="flex min-h-[300px] items-center justify-center text-center">
+          <div className="flex min-h-[220px] items-center justify-center text-center">
             <div>
               <h2 className="font-display text-2xl text-text-primary">
-                Your source draft will show here.
+                Your source will show here.
               </h2>
               <p className="mt-2 max-w-md text-sm leading-relaxed text-text-secondary">
-                Once it is ready, send it straight into Create Posts to build the
-                30-day calendar.
+                When it is ready, press “Build the month” and IrieStack makes
+                the calendar.
               </p>
             </div>
           </div>
@@ -416,7 +422,7 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
                 onClick={() => sendToCreatePosts()}
                 className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary transition-colors hover:bg-accent-light"
               >
-                Use for Posts
+                Build the month
               </button>
             </div>
 
@@ -430,20 +436,25 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
                 </div>
               </div>
             )}
-            <FuelList title="Post Angles" items={fuel.angles} />
-            <FuelList title="Talking Points" items={fuel.talkingPoints} />
-            <FuelList title="Questions to Explore" items={fuel.questions} />
-            <FuelList title="Guardrails" items={fuel.cautions} />
+            <details className="group">
+              <summary className="cursor-pointer border-b border-border-subtle py-4 text-sm font-medium text-accent-deep">
+                Show the research notes
+              </summary>
+              <FuelList title="Post Angles" items={fuel.angles} />
+              <FuelList title="Talking Points" items={fuel.talkingPoints} />
+              <FuelList title="Questions to Explore" items={fuel.questions} />
+              <FuelList title="Guardrails" items={fuel.cautions} />
+            </details>
           </div>
         )}
       </section>
 
       {savedFuels.length > 0 && (
-        <section className="lg:col-span-2">
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-accent-deep">
-            Saved Fuel
-          </h2>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <details className="lg:col-span-2">
+          <summary className="cursor-pointer text-sm font-medium uppercase tracking-[0.18em] text-accent-deep">
+            Saved Sources
+          </summary>
+          <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {savedFuels.map((item) => (
               <article
                 key={item.id}
@@ -471,13 +482,13 @@ export function ResearchClient({ initialFuels }: { initialFuels: InitialFuel[] }
                     onClick={() => sendToCreatePosts(savedFuelToSource(item))}
                     className="shrink-0 rounded-md border border-border bg-bg-elevated px-3 py-2 text-xs font-medium text-text-primary transition-colors hover:bg-bg-hover"
                   >
-                    Use
+                    Build month
                   </button>
                 </div>
               </article>
             ))}
           </div>
-        </section>
+        </details>
       )}
     </div>
   );

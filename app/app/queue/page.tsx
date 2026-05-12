@@ -70,29 +70,13 @@ export default async function QueuePage({
       <header className="workspace-header">
         <div>
           <p className="workspace-kicker">Approvals</p>
-          <h1 className="workspace-title">Review what needs a yes or no.</h1>
+          <h1 className="workspace-title">Clear the review pile.</h1>
           <p className="workspace-copy">
-            Fix copy, add images, approve clean posts, and send ready pieces into
-            the posting queue.
+            Open the next post, add the missing image if it needs one, then approve
+            the pieces that are ready to go.
           </p>
         </div>
       </header>
-
-      <nav className="mb-4 flex flex-wrap gap-2">
-        {STATUSES.map((item) => (
-          <Link
-            key={item}
-            href={`/app/queue?status=${item}`}
-            className={`inline-flex min-h-11 items-center rounded-md border px-4 text-sm font-medium transition-colors ${
-              item === status
-                ? "border-border-strong bg-bg-active text-text-primary"
-                : "border-border bg-bg-surface text-text-secondary hover:bg-bg-hover"
-            }`}
-          >
-            {statusLabel(item)}
-          </Link>
-        ))}
-      </nav>
 
       {error ? (
         <p className="mt-8 rounded-md border border-destructive/30 bg-bg-elevated p-4 text-sm text-destructive">
@@ -101,6 +85,7 @@ export default async function QueuePage({
       ) : (
         <div className="space-y-3">
           <NextActionPanel pieces={(pieces ?? []) as unknown as PieceRow[]} status={status} />
+          <StatusNav status={status} />
           {((pieces ?? []) as unknown as PieceRow[]).map((piece) => (
             <QueuePiece key={piece.id} piece={piece} />
           ))}
@@ -124,6 +109,26 @@ export default async function QueuePage({
   );
 }
 
+function StatusNav({ status }: { status: string }) {
+  return (
+    <nav className="flex flex-wrap gap-2">
+      {STATUSES.map((item) => (
+        <Link
+          key={item}
+          href={`/app/queue?status=${item}`}
+          className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm font-medium transition-colors ${
+            item === status
+              ? "border-accent bg-accent text-text-primary"
+              : "border-border bg-bg-surface text-text-secondary hover:bg-bg-hover"
+          }`}
+        >
+          {statusLabel(item)}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 function NextActionPanel({ pieces, status }: { pieces: PieceRow[]; status: string }) {
   const imageItem = pieces.find(needsImage);
   const readyItem = pieces.find(
@@ -138,17 +143,27 @@ function NextActionPanel({ pieces, status }: { pieces: PieceRow[]; status: strin
   if (!target) return null;
 
   return (
-    <section className="rounded-md bg-bg-surface p-4 shadow-card">
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <section className="rounded-md border border-border bg-bg-surface p-4 shadow-card">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div>
-          <p className="workspace-kicker">Next best move</p>
-          <h2 className="mt-1 text-base font-semibold text-text-primary">
+          <p className="workspace-kicker">5-minute review sprint</p>
+          <h2 className="mt-1 font-display text-2xl leading-tight text-text-primary">
             {nextActionTitle(target, status)}
           </h2>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="mt-2 max-w-3xl text-sm text-text-secondary">
             {target.title} · {pretty(target.platform)} ·{" "}
             {target.scheduled_for ? new Date(target.scheduled_for).toLocaleDateString() : "Unscheduled"}
           </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <ReviewStat label="In this view" value={pieces.length.toString()} />
+            <ReviewStat label="Need images" value={pieces.filter(needsImage).length.toString()} />
+            <ReviewStat
+              label="Ready now"
+              value={pieces
+                .filter((piece) => piece.validation?.ok !== false && !needsImage(piece))
+                .length.toString()}
+            />
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {needsImage(target) ? (
@@ -156,11 +171,11 @@ function NextActionPanel({ pieces, status }: { pieces: PieceRow[]; status: strin
               href={`#post-${target.id}`}
               className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary"
             >
-              Upload image
+              Add image
             </Link>
           ) : readyItem?.id === target.id ? (
-            <ApproveButton scope={{ pieceId: target.id }} variant="secondary">
-              Approve this post
+            <ApproveButton scope={{ pieceId: target.id }}>
+              Approve & schedule
             </ApproveButton>
           ) : (
             <Link
@@ -176,6 +191,15 @@ function NextActionPanel({ pieces, status }: { pieces: PieceRow[]; status: strin
   );
 }
 
+function ReviewStat({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="inline-flex min-h-8 items-center gap-2 rounded-full border border-border-subtle bg-bg-elevated px-3 text-text-secondary">
+      <strong className="text-text-primary">{value}</strong>
+      {label}
+    </span>
+  );
+}
+
 function QueuePiece({ piece }: { piece: PieceRow }) {
   const canPost =
     piece.status === "approved" &&
@@ -187,11 +211,13 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
     !needsImage(piece);
 
   return (
-    <article id={`post-${piece.id}`} className="rounded-md bg-bg-surface shadow-card">
+    <article id={`post-${piece.id}`} className="rounded-md border border-border bg-bg-surface shadow-card">
       <header className="grid gap-3 border-b border-border-subtle p-4 lg:grid-cols-[minmax(0,1fr)_220px]">
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wider text-text-muted">
-            <span className="font-semibold text-text-primary">{pretty(piece.platform)}</span>
+            <span className="rounded-full bg-bg-elevated px-2 py-1 font-semibold text-text-primary">
+              {pretty(piece.platform)}
+            </span>
             <span>{pretty(piece.level)}</span>
             <span>{pretty(piece.format)}</span>
             {piece.destination?.label && <span>To {piece.destination.label}</span>}
@@ -202,7 +228,7 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2 text-xs lg:text-right">
-          <div>
+          <div className="rounded-md bg-bg-elevated p-2">
             <p className="uppercase tracking-wider text-text-muted">Time</p>
             <p className="mt-1 text-text-primary">
               {piece.scheduled_for
@@ -210,7 +236,7 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
                 : "Unscheduled"}
             </p>
           </div>
-          <div>
+          <div className="rounded-md bg-bg-elevated p-2">
             <p className="uppercase tracking-wider text-text-muted">{operatorStatus(piece)}</p>
             <p className="mt-1 text-text-primary">
               {charLabel(piece.validation, piece.body)}
@@ -223,9 +249,11 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
       </header>
 
       <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <p className="whitespace-pre-wrap text-[15px] leading-[1.65] text-text-primary">
-          {piece.body}
-        </p>
+        <div className="rounded-md border border-border-subtle bg-bg-primary p-4">
+          <p className="whitespace-pre-wrap text-[15px] leading-[1.6] text-text-primary">
+            {piece.body}
+          </p>
+        </div>
 
         <div className="space-y-3">
           {piece.metadata?.visualPrompt && piece.metadata.mediaType !== "none" && (
@@ -239,8 +267,8 @@ function QueuePiece({ piece }: { piece: PieceRow }) {
 
           <div className="flex flex-wrap items-center gap-3 rounded-md border border-border-subtle bg-bg-elevated p-3">
             {canApprove && (
-              <ApproveButton scope={{ pieceId: piece.id }} variant="secondary">
-                Approve post
+              <ApproveButton scope={{ pieceId: piece.id }}>
+                Approve & schedule
               </ApproveButton>
             )}
             {canPost && <PublishButton pieceId={piece.id} />}
@@ -291,8 +319,8 @@ function VisualBrief({
       </div>
       <p className="text-sm leading-relaxed text-text-secondary">{prompt}</p>
       <p className="mt-2 text-xs leading-relaxed text-text-muted">
-        Upload one finished JPG or PNG. Square or portrait works best. Once it is
-        uploaded, this post can move forward.
+        Drop in the image you want paired with this post. Square or portrait is
+        safest. Once it is added, this post can move forward.
       </p>
       <MediaUploadButton pieceId={pieceId} initialUrl={imageUrl} />
     </div>
@@ -322,19 +350,21 @@ function operatorStatus(piece: PieceRow) {
 }
 
 function statusLabel(value: string) {
-  if (value === "draft") return "Draft posts";
-  if (value === "pending_approval") return "Needs review";
-  if (value === "approved") return "Approved";
+  if (value === "draft") return "To finish";
+  if (value === "pending_approval") return "Ready";
+  if (value === "approved") return "Scheduled";
+  if (value === "posted") return "Live";
   if (value === "failed") return "Issues";
+  if (value === "rejected") return "Skipped";
   return pretty(value);
 }
 
 function nextActionTitle(piece: PieceRow, status: string) {
-  if (needsImage(piece)) return "Add one image, then this post can be approved.";
+  if (needsImage(piece)) return "Add one image and unlock the next post.";
   if (piece.validation?.ok === false) return "Fix this post before it moves forward.";
   if (status === "approved") return "This one is ready for delivery.";
   if (piece.status === "posted") return "This is already posted. Check the receipt.";
-  return "Approve one clean post and keep momentum.";
+  return "Approve one clean post and keep the month moving.";
 }
 
 function charLabel(validation: PieceRow["validation"], body: string) {

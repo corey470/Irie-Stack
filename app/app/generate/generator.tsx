@@ -164,7 +164,7 @@ export function Generator() {
                   : "border-border bg-bg-surface text-text-secondary hover:bg-bg-hover"
               }`}
             >
-              {mode === "paste" ? "Paste" : "URL"}
+              {mode === "paste" ? "Use source" : "Use URL"}
             </button>
           ))}
         </div>
@@ -174,7 +174,7 @@ export function Generator() {
             htmlFor="source"
             className="block text-sm font-medium text-text-primary"
           >
-            {sourceMode === "url" ? "Link to use" : "Paste your idea"}
+            {sourceMode === "url" ? "Link to use" : "What should this month be about?"}
           </label>
           {sourceMode === "paste" && !source && (
             <button
@@ -212,7 +212,7 @@ export function Generator() {
               onChange={(e) => setSource(e.target.value)}
               maxLength={12000}
               disabled={status === "running"}
-              placeholder="Paste a transcript, a blog draft, a voice memo dump, a rough thought..."
+              placeholder="Paste the source draft, transcript, rough thought, or campaign brief..."
               className="w-full resize-y rounded-md border border-border bg-bg-surface px-4 py-3 text-[15px] leading-[1.6] text-text-primary shadow-card transition-colors placeholder:text-text-muted focus:border-accent disabled:opacity-60"
             />
             <div className="mt-2 flex items-center justify-between text-xs text-text-muted">
@@ -225,8 +225,12 @@ export function Generator() {
           </div>
 
           <aside className="border-t border-border-subtle bg-bg-elevated p-4 xl:border-l xl:border-t-0">
-            <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-accent-deep">
-              Plan Controls
+            <p className="mb-1 text-xs font-medium uppercase tracking-[0.18em] text-accent-deep">
+              Posting Defaults
+            </p>
+            <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+              These are just defaults. You can change individual posts from the
+              calendar and review screens.
             </p>
         <div className="grid gap-4">
           <div>
@@ -234,7 +238,7 @@ export function Generator() {
               htmlFor="approvalCadence"
               className="mb-2 block text-sm font-medium text-text-primary"
             >
-              How should approvals work?
+              How much do you want to approve?
             </label>
             <select
               id="approvalCadence"
@@ -245,18 +249,18 @@ export function Generator() {
               disabled={status === "running"}
               className="h-12 w-full rounded-md border border-border bg-bg-surface px-3 text-[15px] text-text-primary shadow-card focus:border-accent disabled:opacity-60"
             >
-              <option value="monthly">Approve the whole month</option>
-              <option value="weekly">Approve one week at a time</option>
-              <option value="daily">Approve each day</option>
+              <option value="monthly">Review the whole month</option>
+              <option value="weekly">Review one week at a time</option>
+              <option value="daily">Review each day</option>
               <option value="individual">Approve every post</option>
-              <option value="autopilot">Autopilot after creating</option>
+              <option value="autopilot">Autopilot when ready</option>
             </select>
           </div>
 
           <div>
             <div className="mb-2 flex items-baseline justify-between gap-3">
               <label className="block text-sm font-medium text-text-primary">
-                What times should posts go out?
+              Posting times
               </label>
               <span className="text-xs text-text-muted">Your local time</span>
             </div>
@@ -309,7 +313,7 @@ export function Generator() {
             }
             className="h-12 rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all hover:bg-accent-light hover:shadow-card-hover disabled:opacity-60"
           >
-            {status === "running" ? `Creating posts... ${elapsed}s` : "Create posts"}
+              {status === "running" ? `Building calendar... ${elapsed}s` : "Build calendar"}
           </button>
           {status === "done" && pieces.length > 0 && (
             <span className="text-sm text-text-muted">
@@ -330,8 +334,8 @@ export function Generator() {
         <section>
           <p className="text-sm text-text-secondary">
             <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent align-middle" />
-            Building a scheduled content run across X, LinkedIn, Threads,
-            Substack, and carousel storyboards.
+            Building the month: posts, platform versions, visual briefs, review
+            list, and schedule.
           </p>
         </section>
       )}

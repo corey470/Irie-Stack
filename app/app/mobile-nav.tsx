@@ -7,33 +7,27 @@ import { SignOutButton } from "@/components/sign-out-button";
 
 const PRIMARY_ITEMS = [
   { label: "Today", href: "/app" },
-  { label: "Create", href: "/app/research" },
-  { label: "Review", href: "/app/queue" },
-  { label: "Posted", href: "/app/relay?status=posted" },
+  { label: "Build", href: "/app/research" },
+  { label: "Calendar", href: "/app/runs" },
+  { label: "Approve", href: "/app/queue" },
 ];
 
 const MENU_GROUPS = [
   {
-    label: "Create",
+    label: "Run the month",
     items: [
-      { label: "Home", href: "/app", body: "See the current state." },
-      { label: "Content Fuel", href: "/app/research", body: "Shape the source." },
-      { label: "Create Posts", href: "/app/generate", body: "Build the month." },
-      { label: "Plan Calendar", href: "/app/runs", body: "See the 30 days." },
+      { label: "Today", href: "/app", body: "See what needs attention." },
+      { label: "Build Month", href: "/app/research", body: "Talk out the idea and build the source." },
+      { label: "Calendar", href: "/app/runs", body: "See the 30 days." },
+      { label: "Approve", href: "/app/queue", body: "Add images and approve posts." },
+      { label: "Publish", href: "/app/relay", body: "Track what is ready, posted, or stuck." },
     ],
   },
   {
-    label: "Operate",
-    items: [
-      { label: "Review Inbox", href: "/app/queue", body: "Fix images and approve posts." },
-      { label: "Delivery Queue", href: "/app/relay", body: "Track what goes live." },
-    ],
-  },
-  {
-    label: "Setup",
+    label: "Tune",
     items: [
       { label: "Setup", href: "/onboarding", body: "Build the root profile." },
-      { label: "Your Voice", href: "/app/stack", body: "Tune the writing style." },
+      { label: "Voice", href: "/app/stack", body: "Tune the writing style." },
       { label: "Settings", href: "/app/settings", body: "Login and accounts." },
     ],
   },
@@ -132,7 +126,7 @@ export function MobileNav({ showSignOut }: { showSignOut: boolean }) {
                 >
                   IrieStack
                 </p>
-                <p className="text-xs text-text-muted">Choose where to go next.</p>
+                <p className="text-xs text-text-muted">Pick the next step.</p>
               </div>
               <button
                 ref={closeRef}
@@ -146,11 +140,11 @@ export function MobileNav({ showSignOut }: { showSignOut: boolean }) {
 
             <div className="flex-1 overflow-y-auto p-4">
               <Link
-                href="/app/generate"
+                href="/app/research"
                 onClick={() => setOpen(false)}
                 className="mb-4 flex min-h-12 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary"
               >
-                Create posts
+                Build month
               </Link>
 
               <div className="space-y-5">

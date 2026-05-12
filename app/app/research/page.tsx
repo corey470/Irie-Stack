@@ -17,11 +17,11 @@ export default async function ResearchPage() {
     <div className="workspace-page">
       <header className="workspace-header">
         <div>
-          <p className="workspace-kicker">Content Fuel</p>
-          <h1 className="workspace-title">Build the source before the posts.</h1>
+          <p className="workspace-kicker">Start a Month</p>
+          <h1 className="workspace-title">Start with one sentence.</h1>
           <p className="workspace-copy">
-            Start with a campaign conversation, URL, or topic. The result becomes
-            the source draft that feeds the 30-day posting plan.
+            Tell IrieStack what you want to promote, explain, or teach. The
+            engine turns that into the source for your 30-day calendar.
           </p>
         </div>
       </header>

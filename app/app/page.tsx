@@ -53,33 +53,33 @@ export default async function AppHome() {
   return (
     <div className="max-w-5xl">
       <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-accent-deep">
-        Home
+        Today
       </p>
       <h1 className="font-display text-[clamp(2rem,4vw,2.75rem)] leading-tight text-text-primary">
-        Turn one idea into posts for the month.
+        Do this next.
       </h1>
-      <p className="mt-4 max-w-2xl text-[clamp(1rem,1.4vw,1.125rem)] leading-relaxed text-text-secondary">
-        Paste a thought, transcript, or article. IrieStack turns it into posts,
-        puts them in a posting schedule, and keeps track of what is ready.
+      <p className="mt-3 max-w-2xl text-[clamp(1rem,1.4vw,1.125rem)] leading-relaxed text-text-secondary">
+        The engine has the moving parts. This screen only shows what needs your
+        attention right now.
       </p>
 
-      <div className="mt-10 flex flex-wrap gap-3">
+      <div className="mt-5 flex flex-wrap gap-3">
         <Link
-          href="/app/generate"
+          href="/app/research"
           className="inline-flex h-12 items-center justify-center rounded-md bg-accent px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-accent-light hover:shadow-card-hover"
         >
-          Create posts
+          Start a month
         </Link>
         <Link
-          href="/app/stack"
+          href="/app/queue"
           className="inline-flex h-12 items-center justify-center rounded-md border border-border bg-bg-surface px-6 text-[15px] font-medium text-text-primary shadow-card transition-all duration-150 hover:bg-bg-hover"
         >
-          Edit your voice
+          Review posts
         </Link>
       </div>
 
       {tableMissing ? (
-        <div className="mt-10 rounded-md border border-warning/30 bg-bg-elevated p-5 text-sm leading-relaxed text-text-secondary">
+        <div className="mt-6 rounded-md border border-warning/30 bg-bg-elevated p-5 text-sm leading-relaxed text-text-secondary">
           The content run schema is in the repo, but it has not been applied to
           Supabase yet. Generation still works; persistence turns on as soon as
           the migration lands.
@@ -98,55 +98,107 @@ function LatestRun({ run, pieces }: { run: RunRow; pieces: PieceRow[] }) {
   const platforms = new Set(pieces.map((piece) => piece.platform)).size;
   const needsImages = pieces.filter(needsImage).length;
   const approved = pieces.filter((piece) => piece.status === "approved").length;
+  const posted = pieces.filter((piece) => piece.status === "posted").length;
+  const ready = Math.max(0, pieces.length - needsImages - flagged - posted);
+  const nextHref = needsImages > 0 || flagged > 0 ? "/app/queue" : `/app/runs/${run.id}`;
+  const nextLabel =
+    needsImages > 0
+      ? "Add images"
+      : flagged > 0
+        ? "Fix flagged posts"
+        : approved > 0
+          ? "Check publishing"
+          : "Review calendar";
+  const nextBody =
+    needsImages > 0
+      ? `${needsImages} posts are written. Add the images and they can move to review.`
+      : flagged > 0
+        ? `${flagged} posts need a quick wording check before they move forward.`
+        : approved > 0
+          ? `${approved} posts are approved. Check what posted and what is still waiting.`
+          : "The plan is drafted. Open the calendar and approve what should go live.";
 
   return (
-    <section className="mt-12 space-y-6">
-      <header className="border-y border-border-subtle py-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+    <section className="mt-6 space-y-4">
+      <div className="rounded-md border border-border bg-bg-surface p-5 shadow-card">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.22em] text-accent-deep">
-              Latest Plan
+            <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-accent-deep">
+              Next step
             </p>
-            <h2 className="font-display text-[clamp(1.75rem,3vw,2.25rem)] leading-tight text-text-primary">
-              {run.name}
+            <h2 className="font-display text-[clamp(1.6rem,3vw,2.1rem)] leading-tight text-text-primary">
+              {nextLabel}
             </h2>
-            {run.summary && (
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
-                {run.summary}
-              </p>
-            )}
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
+              {nextBody}
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
+          <Link
+            href={nextHref}
+            className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-5 text-sm font-medium text-text-primary transition-colors hover:bg-accent-light"
+          >
+            {nextLabel}
+          </Link>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Metric label="Need images" value={needsImages.toString()} />
+          <Metric label="Ready" value={ready.toString()} />
+          <Metric label="Approved" value={approved.toString()} />
+          <Metric label="Posted" value={posted.toString()} />
+        </div>
+      </div>
+
+      <details className="rounded-md border border-border bg-bg-surface shadow-card">
+        <summary className="cursor-pointer list-none p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="mb-1 text-xs font-medium uppercase tracking-[0.18em] text-accent-deep">
+                Current month
+              </p>
+              <h2 className="text-base font-semibold text-text-primary">
+                {run.name}
+              </h2>
+            </div>
+            <span className="text-sm font-medium text-accent-deep">
+              Open details
+            </span>
+          </div>
+        </summary>
+        <div className="border-t border-border-subtle p-4">
+          {run.summary && (
+            <p className="max-w-3xl text-sm leading-relaxed text-text-secondary">
+              {run.summary}
+            </p>
+          )}
+          <div className="mt-4 grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
             <Metric label="Pieces" value={pieces.length.toString()} />
             <Metric label="Platforms" value={platforms.toString()} />
             <Metric label="Approved" value={approved.toString()} />
             <Metric label="Images" value={needsImages.toString()} />
           </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href={`/app/runs/${run.id}`}
+              className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary hover:bg-accent/80"
+            >
+              Open calendar
+            </Link>
+            <Link
+              href="/app/queue"
+              className="inline-flex min-h-11 items-center rounded-md border border-border-strong bg-bg-surface px-4 text-sm font-medium text-text-primary hover:bg-bg-hover"
+            >
+              Open review
+            </Link>
+            <SaveRunMemoryButton runId={run.id} />
+          </div>
         </div>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link
-            href={`/app/runs/${run.id}`}
-            className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-text-primary hover:bg-accent/80"
-          >
-            Review this plan
-          </Link>
-          <Link
-            href="/app/queue"
-            className="inline-flex min-h-11 items-center rounded-md border border-border-strong bg-bg-surface px-4 text-sm font-medium text-text-primary hover:bg-bg-hover"
-          >
-            Open approvals
-          </Link>
-          <SaveRunMemoryButton runId={run.id} />
-        </div>
-        {(flagged > 0 || needsImages > 0) && (
-          <p className="mt-3 text-sm text-text-secondary">
-            {needsImages > 0 ? `${needsImages} posts need images. ` : ""}
-            {flagged > 0 ? `${flagged} posts need fixes.` : ""}
-          </p>
-        )}
-      </header>
+      </details>
 
-      <div className="space-y-3">
+      <details className="rounded-md border border-border bg-bg-surface shadow-card">
+        <summary className="cursor-pointer list-none p-4 text-sm font-medium text-accent-deep">
+          Preview the next posts
+        </summary>
+        <div className="space-y-3 border-t border-border-subtle p-4">
         {pieces.slice(0, 12).map((piece) => (
           <div
             key={piece.id}
@@ -194,28 +246,29 @@ function LatestRun({ run, pieces }: { run: RunRow; pieces: PieceRow[] }) {
             See all {pieces.length} posts
           </Link>
         )}
-      </div>
+        </div>
+      </details>
     </section>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="mt-16 grid gap-4 sm:grid-cols-3">
+    <div className="mt-8 grid gap-4 sm:grid-cols-3">
       <PlaceholderCard
         n="01"
-        title="Add your idea"
-        body="Use a post draft, transcript, article, or rough thought."
+        title="Start the month"
+        body="Tell the assistant the campaign idea in normal words."
       />
       <PlaceholderCard
         n="02"
-        title="Get the posts"
-        body="The app drafts platform-ready posts from that one source."
+        title="Review the calendar"
+        body="The engine turns the idea into a full 30-day schedule."
       />
       <PlaceholderCard
         n="03"
-        title="Approve or post"
-        body="Ready posts move into the posting queue for each account."
+        title="Approve what is ready"
+        body="Add images where needed, approve posts, and track receipts."
       />
     </div>
   );
